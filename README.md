@@ -1,2 +1,2 @@
 # University Files
-Some useful material and exercises of all years.
+A backup of all the University of Turin files, notes and exercises.
