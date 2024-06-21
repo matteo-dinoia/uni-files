@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>A taste of Agda | Introduction to Program Verification in Agda</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="A taste of Agda" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="Introduction to Program Verification in Agda" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="A taste of Agda" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"A taste of Agda","url":"/pages/Chapter.Preamble.Demo.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/Agda.css">
+  <script src="../assets/js/mathjax.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="../assets/js/codereveal.js"></script>
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Introduction to Program Verification in Agda" /><!-- <script src="/assets/js/clipboard.min.js"></script> -->
+  <!-- <script src="/assets/js/codeselect.js"></script> -->
+</head>
+<body>
+
+<header class="site-header" role="banner">
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="../index.html">Introduction to Program Verification in Agda</a>
+    
+
+    <nav class="site-nav">
+      <a href="https://agda.readthedocs.io/en/latest/">AGDA DOCS</a>
+    </nav>
+  </div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+  <ul class="menu">
+  <li><a href="Main.html">‹ Table of contents</a></li>
+  <li>
+    <a href="Chapter.Preamble.Setup.html">Setup ›</a></li>
+</ul>
+  <header class="post-header">
+    <h1 class="post-title">A taste of Agda</h1>
+  </header>
+
+  <div class="post-content">
+    <pre class="Agda"><a id="67" class="Keyword">module</a> <a id="74" href="Chapter.Preamble.Demo.html" class="Module">Chapter.Preamble.Demo</a> <a id="96" class="Keyword">where</a>
+</pre>
+<h2 id="imports">Imports</h2>
+
+<p>The program described in this chapter makes use of natural numbers
+and of the equality predicate, which must be suitably defined and
+imported for this program to correctly type check and compile. The
+directives shown below import the necessary definitions from the
+Agda library used in this course. For the time being, we will use
+natural numbers and equality as black boxes; we will see how they can
+be defined in Agda later on.</p>
+
+<pre class="Agda"><a id="554" class="Keyword">open</a> <a id="559" class="Keyword">import</a> <a id="566" href="Library.Equality.html" class="Module">Library.Equality</a>
+<a id="583" class="Keyword">open</a> <a id="588" class="Keyword">import</a> <a id="595" href="Library.Equality.Reasoning.html" class="Module">Library.Equality.Reasoning</a>
+<a id="622" class="Keyword">open</a> <a id="627" class="Keyword">import</a> <a id="634" href="Library.Nat.html" class="Module">Library.Nat</a>
+<a id="646" class="Keyword">open</a> <a id="651" class="Keyword">import</a> <a id="658" href="Library.Nat.Properties.html" class="Module">Library.Nat.Properties</a>
+</pre>
+<h2 id="the-sequence-of-fibonacci-numbers">The sequence of Fibonacci numbers</h2>
+
+<p>To get a taste of Agda, let us write a <code class="language-plaintext highlighter-rouge">fibo</code> function that computes
+the k-th number in the sequence of Fibonacci, that is the sequence</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, ...
+</code></pre></div></div>
+
+<p>that starts with 0 followed by 1 and such that each subsequent
+number is the sum of the previous two. For example, we expect <code class="language-plaintext highlighter-rouge">fibo</code>
+to return 55 when it is applied to 10, since 55 is the 11th number
+in the sequence. The easiest implementation of <code class="language-plaintext highlighter-rouge">fibo</code> in Agda is
+shown below.</p>
+
+<pre class="Agda"><a id="fibo"></a><a id="1193" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="1198" class="Symbol">:</a> <a id="1200" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="1202" class="Symbol">-&gt;</a> <a id="1205" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="1207" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="1212" class="Number">0</a>               <a id="1228" class="Symbol">=</a> <a id="1230" class="Number">0</a>
+<a id="1232" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="1237" class="Number">1</a>               <a id="1253" class="Symbol">=</a> <a id="1255" class="Number">1</a>
+<a id="1257" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="1262" class="Symbol">(</a><a id="1263" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="1268" class="Symbol">(</a><a id="1269" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="1274" href="Chapter.Preamble.Demo.html#1274" class="Bound">k</a><a id="1275" class="Symbol">))</a> <a id="1278" class="Symbol">=</a> <a id="1280" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="1285" href="Chapter.Preamble.Demo.html#1274" class="Bound">k</a> <a id="1287" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="1289" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="1294" class="Symbol">(</a><a id="1295" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="1300" href="Chapter.Preamble.Demo.html#1274" class="Bound">k</a><a id="1301" class="Symbol">)</a>
+</pre>
+<p>Once this script is loaded, we can ask Agda to compute the result of
+applying <code class="language-plaintext highlighter-rouge">fibo</code> to some numbers. By pressing <code class="language-plaintext highlighter-rouge">C-c C-n</code> and then
+entering <code class="language-plaintext highlighter-rouge">fibo 10</code> we obtain 55, as expected.</p>
+
+<p>It is a known fact that the shown implementation of <code class="language-plaintext highlighter-rouge">fibo</code> is very
+inefficient. In fact, the time for computing the k-th Fibonacci
+number is exponential in k. We can propose a more efficient,
+albeit slightly more complex function that computes the k-th
+Fibonacci number in linear time, as follows.</p>
+
+<pre class="Agda"><a id="fibo-from"></a><a id="1792" href="Chapter.Preamble.Demo.html#1792" class="Function">fibo-from</a> <a id="1802" class="Symbol">:</a> <a id="1804" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="1806" class="Symbol">-&gt;</a> <a id="1809" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="1811" class="Symbol">-&gt;</a> <a id="1814" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="1816" class="Symbol">-&gt;</a> <a id="1819" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="1821" href="Chapter.Preamble.Demo.html#1792" class="Function">fibo-from</a> <a id="1831" href="Chapter.Preamble.Demo.html#1831" class="Bound">m</a> <a id="1833" href="Chapter.Preamble.Demo.html#1833" class="Bound">n</a> <a id="1835" class="Number">0</a>               <a id="1851" class="Symbol">=</a> <a id="1853" href="Chapter.Preamble.Demo.html#1831" class="Bound">m</a>
+<a id="1855" href="Chapter.Preamble.Demo.html#1792" class="Function">fibo-from</a> <a id="1865" href="Chapter.Preamble.Demo.html#1865" class="Bound">m</a> <a id="1867" href="Chapter.Preamble.Demo.html#1867" class="Bound">n</a> <a id="1869" class="Number">1</a>               <a id="1885" class="Symbol">=</a> <a id="1887" href="Chapter.Preamble.Demo.html#1867" class="Bound">n</a>
+<a id="1889" href="Chapter.Preamble.Demo.html#1792" class="Function">fibo-from</a> <a id="1899" href="Chapter.Preamble.Demo.html#1899" class="Bound">m</a> <a id="1901" href="Chapter.Preamble.Demo.html#1901" class="Bound">n</a> <a id="1903" class="Symbol">(</a><a id="1904" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="1909" class="Symbol">(</a><a id="1910" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="1915" href="Chapter.Preamble.Demo.html#1915" class="Bound">k</a><a id="1916" class="Symbol">))</a> <a id="1919" class="Symbol">=</a> <a id="1921" href="Chapter.Preamble.Demo.html#1792" class="Function">fibo-from</a> <a id="1931" href="Chapter.Preamble.Demo.html#1901" class="Bound">n</a> <a id="1933" class="Symbol">(</a><a id="1934" href="Chapter.Preamble.Demo.html#1899" class="Bound">m</a> <a id="1936" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="1938" href="Chapter.Preamble.Demo.html#1901" class="Bound">n</a><a id="1939" class="Symbol">)</a> <a id="1941" class="Symbol">(</a><a id="1942" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="1947" href="Chapter.Preamble.Demo.html#1915" class="Bound">k</a><a id="1948" class="Symbol">)</a>
+
+<a id="fast-fibo"></a><a id="1951" href="Chapter.Preamble.Demo.html#1951" class="Function">fast-fibo</a> <a id="1961" class="Symbol">:</a> <a id="1963" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="1965" class="Symbol">-&gt;</a> <a id="1968" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="1970" href="Chapter.Preamble.Demo.html#1951" class="Function">fast-fibo</a> <a id="1980" class="Symbol">=</a> <a id="1982" href="Chapter.Preamble.Demo.html#1792" class="Function">fibo-from</a> <a id="1992" class="Number">0</a> <a id="1994" class="Number">1</a>
+</pre>
+<p>The <code class="language-plaintext highlighter-rouge">fast-fibo</code> function is just a wrapper for the auxiliary
+<code class="language-plaintext highlighter-rouge">fibo-from</code> function, which takes three arguments: <code class="language-plaintext highlighter-rouge">m</code> and <code class="language-plaintext highlighter-rouge">n</code>, which
+are supposed to be two subsequent numbers in the Fibonacci sequence,
+and then an index <code class="language-plaintext highlighter-rouge">k</code> which represents the number of steps to make
+in the sequence, starting from <code class="language-plaintext highlighter-rouge">m</code> and <code class="language-plaintext highlighter-rouge">n</code>, in order to reach the
+desired number. When <code class="language-plaintext highlighter-rouge">k</code> is 0, the desired number is just <code class="language-plaintext highlighter-rouge">m</code>. When
+<code class="language-plaintext highlighter-rouge">k</code> is 1, the desired number is just <code class="language-plaintext highlighter-rouge">n</code>.  When <code class="language-plaintext highlighter-rouge">k</code> is greater than
+one, we recursively apply <code class="language-plaintext highlighter-rouge">fibo-from</code> so that <code class="language-plaintext highlighter-rouge">m</code> becomes <code class="language-plaintext highlighter-rouge">n</code>, <code class="language-plaintext highlighter-rouge">n</code>
+becomes the sum of the (old) <code class="language-plaintext highlighter-rouge">m</code> and of the (old) <code class="language-plaintext highlighter-rouge">n</code>, and <code class="language-plaintext highlighter-rouge">k</code> is
+decreased by one. That is, <code class="language-plaintext highlighter-rouge">fibo-from</code> is basically a functional
+implementation of the classical loop that finds the desired number
+in the Fibonacci sequence by using (and updating) two auxiliary
+variables <code class="language-plaintext highlighter-rouge">m</code> and <code class="language-plaintext highlighter-rouge">n</code> initialized with 0 and 1.</p>
+
+<p>Now, since <code class="language-plaintext highlighter-rouge">fast-fibo</code> (and particularly <code class="language-plaintext highlighter-rouge">fibo-from</code> on which it
+relies) is substantially more complex than <code class="language-plaintext highlighter-rouge">fibo</code>, we may wonder
+whether <code class="language-plaintext highlighter-rouge">fast-fibo</code> is in fact equivalent to <code class="language-plaintext highlighter-rouge">fibo</code>. We may perform
+a few test asking Agda to evaluate <code class="language-plaintext highlighter-rouge">fast-fibo</code>, but these tests are
+<strong>necessarily finite</strong>. The only way to be absolutely sure that
+<code class="language-plaintext highlighter-rouge">fibo</code> and <code class="language-plaintext highlighter-rouge">fast-fibo</code> are the same function is by <strong>proving</strong> that
+they are equivalent.</p>
+
+<p>It is not too difficult to come up with a pen-and-paper proof that
+<code class="language-plaintext highlighter-rouge">fibo</code> and <code class="language-plaintext highlighter-rouge">fast-fibo</code> are indeed equivalent, but the doubt might
+remain that the proof could contain a mistake. After all, we’re
+humans and all humans make mistakes. Here is where Agda comes to the
+rescue, in that it provides us with some tools for <strong>checking</strong>
+whether an equivance proof for <code class="language-plaintext highlighter-rouge">fibo</code> and <code class="language-plaintext highlighter-rouge">fast-fibo</code> is valid. Even
+more surprisingly, the equivalence proof turns out to be a
+collection of functions written in the same language in which we
+have implemented <code class="language-plaintext highlighter-rouge">fibo</code> and <code class="language-plaintext highlighter-rouge">fast-fibo</code>.</p>
+
+<p>Below are two functions, called <code class="language-plaintext highlighter-rouge">lemma</code> and <code class="language-plaintext highlighter-rouge">theorem</code>, that prove
+the equivalence of <code class="language-plaintext highlighter-rouge">fibo</code> and <code class="language-plaintext highlighter-rouge">fast-fibo</code>. For the time being they
+look like almost random sequences of meaningless symbols. In this
+course we will learn how to write such proofs with the help of the
+interactive features of Agda. For the sake of this quick
+introduction, though, it may be worth to notice that in the
+<strong>types</strong> of these functions we recognize occurrences of <code class="language-plaintext highlighter-rouge">∀</code> (the
+<em>universal quantifier</em>), <code class="language-plaintext highlighter-rouge">-&gt;</code> (<em>logical implication</em>), and <code class="language-plaintext highlighter-rouge">==</code>
+(<em>propositional equality</em>). In particular the type of <code class="language-plaintext highlighter-rouge">theorem</code>
+specifies that, for every natural number <code class="language-plaintext highlighter-rouge">k</code>, the value resulting
+from the application <code class="language-plaintext highlighter-rouge">fast-fibo k</code> is the same value resulting from
+the application <code class="language-plaintext highlighter-rouge">fibo k</code>.</p>
+
+<pre class="Agda"><a id="lemma"></a><a id="4575" href="Chapter.Preamble.Demo.html#4575" class="Function">lemma</a> <a id="4581" class="Symbol">:</a> <a id="4583" class="Symbol">∀(</a><a id="4585" href="Chapter.Preamble.Demo.html#4585" class="Bound">k</a> <a id="4587" href="Chapter.Preamble.Demo.html#4587" class="Bound">i</a> <a id="4589" class="Symbol">:</a> <a id="4591" href="Library.Nat.html#32" class="Datatype">ℕ</a><a id="4592" class="Symbol">)</a> <a id="4594" class="Symbol">-&gt;</a> <a id="4597" href="Chapter.Preamble.Demo.html#1792" class="Function">fibo-from</a> <a id="4607" class="Symbol">(</a><a id="4608" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="4613" href="Chapter.Preamble.Demo.html#4585" class="Bound">k</a><a id="4614" class="Symbol">)</a> <a id="4616" class="Symbol">(</a><a id="4617" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="4622" class="Symbol">(</a><a id="4623" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4628" href="Chapter.Preamble.Demo.html#4585" class="Bound">k</a><a id="4629" class="Symbol">))</a> <a id="4632" href="Chapter.Preamble.Demo.html#4587" class="Bound">i</a> <a id="4634" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="4637" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="4642" class="Symbol">(</a><a id="4643" href="Chapter.Preamble.Demo.html#4587" class="Bound">i</a> <a id="4645" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="4647" href="Chapter.Preamble.Demo.html#4585" class="Bound">k</a><a id="4648" class="Symbol">)</a>
+<a id="4650" href="Chapter.Preamble.Demo.html#4575" class="Function">lemma</a> <a id="4656" href="Chapter.Preamble.Demo.html#4656" class="Bound">k</a> <a id="4658" class="Number">0</a> <a id="4660" class="Symbol">=</a> <a id="4662" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+<a id="4667" href="Chapter.Preamble.Demo.html#4575" class="Function">lemma</a> <a id="4673" href="Chapter.Preamble.Demo.html#4673" class="Bound">k</a> <a id="4675" class="Number">1</a> <a id="4677" class="Symbol">=</a> <a id="4679" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+<a id="4684" href="Chapter.Preamble.Demo.html#4575" class="Function">lemma</a> <a id="4690" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a> <a id="4692" class="Symbol">(</a><a id="4693" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4698" class="Symbol">(</a><a id="4699" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4704" href="Chapter.Preamble.Demo.html#4704" class="Bound">i</a><a id="4705" class="Symbol">))</a> <a id="4708" class="Symbol">=</a>
+  <a id="4712" href="Library.Equality.Reasoning.html#142" class="Function Operator">begin</a>
+    <a id="4722" href="Chapter.Preamble.Demo.html#1792" class="Function">fibo-from</a> <a id="4732" class="Symbol">(</a><a id="4733" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="4738" class="Symbol">(</a><a id="4739" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4744" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a><a id="4745" class="Symbol">))</a> <a id="4748" class="Symbol">(</a><a id="4749" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="4754" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a> <a id="4756" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="4758" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="4763" class="Symbol">(</a><a id="4764" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4769" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a><a id="4770" class="Symbol">))</a> <a id="4773" class="Symbol">(</a><a id="4774" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4779" href="Chapter.Preamble.Demo.html#4704" class="Bound">i</a><a id="4780" class="Symbol">)</a> <a id="4782" href="Library.Equality.Reasoning.html#440" class="Function Operator">==⟨⟩</a>
+    <a id="4791" href="Chapter.Preamble.Demo.html#1792" class="Function">fibo-from</a> <a id="4801" class="Symbol">(</a><a id="4802" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="4807" class="Symbol">(</a><a id="4808" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4813" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a><a id="4814" class="Symbol">))</a> <a id="4817" class="Symbol">(</a><a id="4818" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="4823" class="Symbol">(</a><a id="4824" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4829" class="Symbol">(</a><a id="4830" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4835" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a><a id="4836" class="Symbol">)))</a> <a id="4840" class="Symbol">(</a><a id="4841" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4846" href="Chapter.Preamble.Demo.html#4704" class="Bound">i</a><a id="4847" class="Symbol">)</a>
+      <a id="4855" href="Library.Equality.Reasoning.html#255" class="Function Operator">==⟨</a> <a id="4859" href="Chapter.Preamble.Demo.html#4575" class="Function">lemma</a> <a id="4865" class="Symbol">(</a><a id="4866" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4871" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a><a id="4872" class="Symbol">)</a> <a id="4874" class="Symbol">(</a><a id="4875" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4880" href="Chapter.Preamble.Demo.html#4704" class="Bound">i</a><a id="4881" class="Symbol">)</a> <a id="4883" href="Library.Equality.Reasoning.html#255" class="Function Operator">⟩</a>
+    <a id="4889" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="4894" class="Symbol">(</a><a id="4895" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4900" href="Chapter.Preamble.Demo.html#4704" class="Bound">i</a> <a id="4902" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="4904" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4909" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a><a id="4910" class="Symbol">)</a> <a id="4912" href="Library.Equality.Reasoning.html#440" class="Function Operator">==⟨⟩</a>
+    <a id="4921" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="4926" class="Symbol">(</a><a id="4927" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4932" class="Symbol">(</a><a id="4933" href="Chapter.Preamble.Demo.html#4704" class="Bound">i</a> <a id="4935" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="4937" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4942" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a><a id="4943" class="Symbol">))</a>
+      <a id="4952" href="Library.Equality.Reasoning.html#255" class="Function Operator">==⟨</a> <a id="4956" href="Library.Equality.html#373" class="Function">cong</a> <a id="4961" class="Symbol">(λ</a> <a id="4964" href="Chapter.Preamble.Demo.html#4964" class="Bound">x</a> <a id="4966" class="Symbol">-&gt;</a> <a id="4969" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="4974" class="Symbol">(</a><a id="4975" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="4980" href="Chapter.Preamble.Demo.html#4964" class="Bound">x</a><a id="4981" class="Symbol">))</a> <a id="4984" class="Symbol">(</a><a id="4985" href="Library.Nat.Properties.html#635" class="Function">+-comm</a> <a id="4992" href="Chapter.Preamble.Demo.html#4704" class="Bound">i</a> <a id="4994" class="Symbol">(</a><a id="4995" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="5000" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a><a id="5001" class="Symbol">))</a> <a id="5004" href="Library.Equality.Reasoning.html#255" class="Function Operator">⟩</a>
+    <a id="5010" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="5015" class="Symbol">(</a><a id="5016" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="5021" class="Symbol">(</a><a id="5022" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="5027" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a> <a id="5029" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="5031" href="Chapter.Preamble.Demo.html#4704" class="Bound">i</a><a id="5032" class="Symbol">))</a> <a id="5035" href="Library.Equality.Reasoning.html#440" class="Function Operator">==⟨⟩</a>
+    <a id="5044" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="5049" class="Symbol">(</a><a id="5050" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="5055" class="Symbol">(</a><a id="5056" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="5061" class="Symbol">(</a><a id="5062" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a> <a id="5064" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="5066" href="Chapter.Preamble.Demo.html#4704" class="Bound">i</a><a id="5067" class="Symbol">)))</a>
+      <a id="5077" href="Library.Equality.Reasoning.html#255" class="Function Operator">==⟨</a> <a id="5081" href="Library.Equality.html#373" class="Function">cong</a> <a id="5086" class="Symbol">(λ</a> <a id="5089" href="Chapter.Preamble.Demo.html#5089" class="Bound">x</a> <a id="5091" class="Symbol">-&gt;</a> <a id="5094" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="5099" class="Symbol">(</a><a id="5100" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="5105" class="Symbol">(</a><a id="5106" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="5111" href="Chapter.Preamble.Demo.html#5089" class="Bound">x</a><a id="5112" class="Symbol">)))</a> <a id="5116" class="Symbol">(</a><a id="5117" href="Library.Nat.Properties.html#635" class="Function">+-comm</a> <a id="5124" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a> <a id="5126" href="Chapter.Preamble.Demo.html#4704" class="Bound">i</a><a id="5127" class="Symbol">)</a> <a id="5129" href="Library.Equality.Reasoning.html#255" class="Function Operator">⟩</a>
+    <a id="5135" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="5140" class="Symbol">(</a><a id="5141" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="5146" class="Symbol">(</a><a id="5147" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="5152" class="Symbol">(</a><a id="5153" href="Chapter.Preamble.Demo.html#4704" class="Bound">i</a> <a id="5155" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="5157" href="Chapter.Preamble.Demo.html#4690" class="Bound">k</a><a id="5158" class="Symbol">)))</a>
+  <a id="5164" href="Library.Equality.Reasoning.html#205" class="Function Operator">end</a>
+
+<a id="theorem"></a><a id="5169" href="Chapter.Preamble.Demo.html#5169" class="Function">theorem</a> <a id="5177" class="Symbol">:</a> <a id="5179" class="Symbol">∀(</a><a id="5181" href="Chapter.Preamble.Demo.html#5181" class="Bound">k</a> <a id="5183" class="Symbol">:</a> <a id="5185" href="Library.Nat.html#32" class="Datatype">ℕ</a><a id="5186" class="Symbol">)</a> <a id="5188" class="Symbol">-&gt;</a> <a id="5191" href="Chapter.Preamble.Demo.html#1951" class="Function">fast-fibo</a> <a id="5201" href="Chapter.Preamble.Demo.html#5181" class="Bound">k</a> <a id="5203" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="5206" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="5211" href="Chapter.Preamble.Demo.html#5181" class="Bound">k</a>
+<a id="5213" href="Chapter.Preamble.Demo.html#5169" class="Function">theorem</a> <a id="5221" href="Chapter.Preamble.Demo.html#5221" class="Bound">k</a> <a id="5223" class="Symbol">=</a>
+  <a id="5227" href="Library.Equality.Reasoning.html#142" class="Function Operator">begin</a>
+    <a id="5237" href="Chapter.Preamble.Demo.html#1951" class="Function">fast-fibo</a> <a id="5247" href="Chapter.Preamble.Demo.html#5221" class="Bound">k</a>     <a id="5253" href="Library.Equality.Reasoning.html#440" class="Function Operator">==⟨⟩</a>
+    <a id="5262" href="Chapter.Preamble.Demo.html#1792" class="Function">fibo-from</a> <a id="5272" class="Number">0</a> <a id="5274" class="Number">1</a> <a id="5276" href="Chapter.Preamble.Demo.html#5221" class="Bound">k</a> <a id="5278" href="Library.Equality.Reasoning.html#255" class="Function Operator">==⟨</a> <a id="5282" href="Chapter.Preamble.Demo.html#4575" class="Function">lemma</a> <a id="5288" class="Number">0</a> <a id="5290" href="Chapter.Preamble.Demo.html#5221" class="Bound">k</a> <a id="5292" href="Library.Equality.Reasoning.html#255" class="Function Operator">⟩</a>
+    <a id="5298" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="5303" class="Symbol">(</a><a id="5304" href="Chapter.Preamble.Demo.html#5221" class="Bound">k</a> <a id="5306" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="5308" class="Number">0</a><a id="5309" class="Symbol">)</a>    <a id="5314" href="Library.Equality.Reasoning.html#255" class="Function Operator">==⟨</a> <a id="5318" href="Library.Equality.html#373" class="Function">cong</a> <a id="5323" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="5328" class="Symbol">(</a><a id="5329" href="Library.Nat.Properties.html#536" class="Function">+-unit-r</a> <a id="5338" href="Chapter.Preamble.Demo.html#5221" class="Bound">k</a><a id="5339" class="Symbol">)</a> <a id="5341" href="Library.Equality.Reasoning.html#255" class="Function Operator">⟩</a>
+    <a id="5347" href="Chapter.Preamble.Demo.html#1193" class="Function">fibo</a> <a id="5352" href="Chapter.Preamble.Demo.html#5221" class="Bound">k</a>
+  <a id="5356" href="Library.Equality.Reasoning.html#205" class="Function Operator">end</a>
+</pre>
+<p>By checking that these functions adhere to the types we’ve given
+them, Agda certifies that <code class="language-plaintext highlighter-rouge">fibo</code> and <code class="language-plaintext highlighter-rouge">fast-fibo</code> are equivalent. So,
+from now on we can safely use whichever function is more convenient,
+preferring <code class="language-plaintext highlighter-rouge">fibo</code> or <code class="language-plaintext highlighter-rouge">fast-fibo</code> depending on whether readability or
+performance is more important.</p>
+
+<h2 id="homework">Homework</h2>
+
+<ol>
+  <li>
+    <p>Let $F_i$ be the $i$-th Fibonacci number, defined by the equations</p>
+
+\[F_0 = 0
+  \qquad
+  F_1 = 1
+  \qquad
+  F_{i+2} = F_i + F_{i+1}\]
+
+    <p>Using pencil and paper, prove that <code class="language-plaintext highlighter-rouge">fibo-from</code> $F_i$ $F_{i+1}$ $k$
+= $F_{i+k}$ by induction on $k$.</p>
+
+    <blockquote class="solution">
+      <p>By induction on $k$. There are two base cases: when $k = 0$,
+then <code class="language-plaintext highlighter-rouge">fibo-from</code> $F_i$ $F_{i+1}$ $0$ = $F_i$ = $F_{i+k}$; when
+$k = 1$, then <code class="language-plaintext highlighter-rouge">fibo-from</code> $F_i$ $F_{i+1}$ $1$ = $F_{i+1}$ =
+$F_{i+k}$. In the inductive case we have $k &gt; 1$. By definition
+of <code class="language-plaintext highlighter-rouge">fibo-from</code> we have <code class="language-plaintext highlighter-rouge">fibo-from</code> $F_i$ $F_{i+1}$ $k$ =
+<code class="language-plaintext highlighter-rouge">fibo-from</code> $F_{i+1}$ $F_{i+2}$ $(k-1)$. Using the induction
+hypothesis we conclude <code class="language-plaintext highlighter-rouge">fibo-from</code> $F_{i+1}$ $F_{i+2}$ $(k-1)$ =
+$F_{i+k}$.</p>
+    </blockquote>
+  </li>
+</ol>
+
+  </div>
+  <ul class="menu">
+  <li><a href="Main.html">‹ Table of contents</a></li>
+  <li>
+    <a href="Chapter.Preamble.Setup.html">Setup ›</a></li>
+</ul>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+  <div class="wrapper">
+    <!-- <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"> -->
+    <!--   <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png"/> -->
+    <!-- </a> -->
+    2022-2023
+    <a href="https://boystrange.github.io">Luca Padovani</a>
+    and <a href="http://www.di.unito.it/~deligu/">Ugo de'Liguoro</a>.
+    Page generated on 20 Sep 2023.
+  </div>
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Introduction to Program Verification in Agda</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Introduction to Program Verification in Agda" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="Introduction to Program Verification in Agda" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Introduction to Program Verification in Agda" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","headline":"Introduction to Program Verification in Agda","name":"Introduction to Program Verification in Agda","url":"/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/Agda.css">
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Introduction to Program Verification in Agda" /><!-- <script src="/assets/js/clipboard.min.js"></script> -->
+  <!-- <script src="/assets/js/codeselect.js"></script> -->
+</head>
+<body>
+
+<header class="site-header" role="banner">
+  <div class="wrapper">
+    <span class="site-title">Introduction to Program Verification in Agda</span>
+    
+
+    <nav class="site-nav">
+      <a href="https://agda.readthedocs.io/en/latest/">AGDA DOCS</a>
+    </nav>
+  </div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+  
+  <header class="post-header">
+    <h1 class="post-title">Introduction to Program Verification in Agda</h1>
+  </header>
+
+  <div class="post-content">
+    <p><a href="pages/Main.html" class="table-of-contents">GO TO THE TABLE OF CONTENTS</a></p>
+
+<h2 id="summary-of-emacs-shortcuts">Summary of Emacs shortcuts</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">C-c C-l</code></td>
+      <td>Load the current file</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">C-c C-d expression</code></td>
+      <td>Show the type of <code class="language-plaintext highlighter-rouge">expression</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">C-c C-n expression</code></td>
+      <td>Normalize <code class="language-plaintext highlighter-rouge">expression</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">C-c C-c argument</code></td>
+      <td>Perform case analysis on <code class="language-plaintext highlighter-rouge">argument</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">C-c C-,</code></td>
+      <td>Show goal and context</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">C-c C-f</code></td>
+      <td>Move forward to the next goal</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">C-c C-b</code></td>
+      <td>Move backward to the previous goal</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">C-c C-r</code></td>
+      <td>Refine the current hole</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">C-c C-SPACE</code></td>
+      <td>Fill the hole with the provided expression</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="ligatures-and-unicode-characters">Ligatures and Unicode characters</h2>
+
+<p>These pages make use of the <a href="https://github.com/tonsky/FiraCode">Fira
+Code</a> font to display Agda
+code. This font is particularly well suited for writing programs
+since it supports a number of <strong>ligatures</strong> that make it possible to
+display certain character sequences as if they were a single
+glyph. A recurring example of ligature is that combining the
+character <code class="language-plaintext highlighter-rouge">-</code> (the minus sign) followed by the character <code class="language-plaintext highlighter-rouge">&gt;</code> (the
+“greater than” sign), which in most fonts is displayed simply as
+<code class="language-plaintext highlighter-rouge">-</code><code class="language-plaintext highlighter-rouge">&gt;</code> whereas using Fira Code it is displayed as <code class="language-plaintext highlighter-rouge">-&gt;</code>. In other
+circumstances, when there is no sequence of characters that produces
+the desired ligature, we will use <strong>Unicode characters</strong>. A typical
+example is that of the character U+2115 corresponding to the glyph
+<code class="language-plaintext highlighter-rouge">ℕ</code>, which normally denotes the set of natural numbers.</p>
+
+<p>The use of ligatures and of Unicode characters makes the code easier
+and more pleasant to read, but it may make it more difficult to type
+as it is not always clear which sequence of characters may produce a
+given ligature or glyph. One possibility is to <strong>cut and paste</strong> the
+desired symbols from these pages. Alternatively, when editing Agda
+scripts in an editor that supports Agda (and that is possibly
+configured to use Fira Code), special symbols can be entered by
+typing particular sequences of characters. Below is a summary of the
+ligatures and Unicode symbols that occur most frequently in these
+pages. The <a href="https://github.com/tonsky/FiraCode">Fira Code</a> page
+contains a full table listing all of the ligatures supported by the
+font.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left"><strong>Symbol</strong></th>
+      <th><strong>Typed with</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-&gt;</code></td>
+      <td><code class="language-plaintext highlighter-rouge">-</code><code class="language-plaintext highlighter-rouge">&gt;</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">==</code> and <code class="language-plaintext highlighter-rouge">!=</code></td>
+      <td><code class="language-plaintext highlighter-rouge">=</code><code class="language-plaintext highlighter-rouge">=</code> and <code class="language-plaintext highlighter-rouge">!</code><code class="language-plaintext highlighter-rouge">=</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">&lt;=&gt;</code></td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;</code><code class="language-plaintext highlighter-rouge">=</code><code class="language-plaintext highlighter-rouge">&gt;</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">&lt;=</code></td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;</code><code class="language-plaintext highlighter-rouge">=</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">&lt;&gt;</code></td>
+      <td><code class="language-plaintext highlighter-rouge">&lt;</code><code class="language-plaintext highlighter-rouge">&gt;</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">ℕ</code></td>
+      <td><code class="language-plaintext highlighter-rouge">\bN</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">∀</code> and <code class="language-plaintext highlighter-rouge">∃</code></td>
+      <td><code class="language-plaintext highlighter-rouge">\all</code> and <code class="language-plaintext highlighter-rouge">\ex</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">⟨</code> and <code class="language-plaintext highlighter-rouge">⟩</code></td>
+      <td><code class="language-plaintext highlighter-rouge">\langle</code> and <code class="language-plaintext highlighter-rouge">\rangle</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">λ</code></td>
+      <td><code class="language-plaintext highlighter-rouge">\lambda</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">₀</code>, <code class="language-plaintext highlighter-rouge">₁</code>, <code class="language-plaintext highlighter-rouge">₂</code>, …</td>
+      <td><code class="language-plaintext highlighter-rouge">\_0</code>, <code class="language-plaintext highlighter-rouge">\_1</code>, <code class="language-plaintext highlighter-rouge">\_2</code>, …</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">∘</code></td>
+      <td><code class="language-plaintext highlighter-rouge">\circ</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">++</code></td>
+      <td><code class="language-plaintext highlighter-rouge">+</code><code class="language-plaintext highlighter-rouge">+</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">∧</code> and <code class="language-plaintext highlighter-rouge">∨</code></td>
+      <td><code class="language-plaintext highlighter-rouge">\and</code> and <code class="language-plaintext highlighter-rouge">\or</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">⊤</code> and <code class="language-plaintext highlighter-rouge">⊥</code></td>
+      <td><code class="language-plaintext highlighter-rouge">\top</code> and <code class="language-plaintext highlighter-rouge">\bot</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">¬</code></td>
+      <td><code class="language-plaintext highlighter-rouge">\neg</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Σ</code></td>
+      <td><code class="language-plaintext highlighter-rouge">\Sigma</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">×</code></td>
+      <td><code class="language-plaintext highlighter-rouge">\x</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">⁺</code></td>
+      <td><code class="language-plaintext highlighter-rouge">\^+</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="references">References</h2>
+
+<p>This course material is partially based on and inspired from the
+following courses, books and notes.</p>
+
+<ul>
+  <li>Dan Licata, <a href="https://www.cs.cmu.edu/~drl/teaching/oplss13/">Programming and Proving in
+Agda</a>, Oregon
+Programming Languages Summer School, 2013.</li>
+  <li>Samuel Mimram, <a href="https://www.lix.polytechnique.fr/Labo/Samuel.Mimram/teaching/INF551/course.pdf">Program =
+Proof</a>,
+independently published, 2020.</li>
+  <li>Peter Selinger, <a href="https://www.mathstat.dal.ca/~selinger/agda-lectures/">Lectures on
+Agda</a>,
+Dalhousie University, 2021.</li>
+  <li>Aaron Stump, <a href="http://www.morganclaypoolpublishers.com/catalog_Orig/product_info.php?cPath=24&amp;products_id=908">Verified Functional Programming in
+Agda</a>,
+ACM Books, 2016.</li>
+  <li>Phil Wadler, Wen Kokke and Jeremy G. Siek, <a href="https://plfa.github.io">Programming Language
+Foundations in Agda</a>, independently
+published, 2019.</li>
+</ul>
+
+<h2 id="copyright">Copyright</h2>
+
+<p>The course material in this site has been posted for your personal
+educational use only. Copying course material from this site for
+distribution (e.g. uploading material to a commercial third-party or
+public website, or otherwise sharing these materials with people who
+are not part of the class) may be a violation of Copyright law. If
+you have questions regarding the use of materials from this site,
+please contact the instructor.</p>
+
+  </div>
+  
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+  <div class="wrapper">
+    <!-- <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"> -->
+    <!--   <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png"/> -->
+    <!-- </a> -->
+    2022-2023
+    <a href="https://boystrange.github.io">Luca Padovani</a>
+    and <a href="http://www.di.unito.it/~deligu/">Ugo de'Liguoro</a>.
+    Page generated on 20 Sep 2023.
+  </div>
+</footer>
+</body>
+
+</html>

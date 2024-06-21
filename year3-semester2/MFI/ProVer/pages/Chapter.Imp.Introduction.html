@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Introduction to IMP and to Hoare Logic | Introduction to Program Verification in Agda</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Introduction to IMP and to Hoare Logic" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="Introduction to Program Verification in Agda" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Introduction to IMP and to Hoare Logic" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Introduction to IMP and to Hoare Logic","url":"/pages/Chapter.Imp.Introduction.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/Agda.css">
+  <script src="../assets/js/mathjax.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="../assets/js/codereveal.js"></script>
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Introduction to Program Verification in Agda" /><!-- <script src="/assets/js/clipboard.min.js"></script> -->
+  <!-- <script src="/assets/js/codeselect.js"></script> -->
+</head>
+<body>
+
+<header class="site-header" role="banner">
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="../index.html">Introduction to Program Verification in Agda</a>
+    
+
+    <nav class="site-nav">
+      <a href="https://agda.readthedocs.io/en/latest/">AGDA DOCS</a>
+    </nav>
+  </div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+  <ul class="menu">
+  <li><a href="Main.html">‹ Table of contents</a></li>
+  <li>
+    <a href="Chapter.Imp.AexpBexp.html">Arithmetic and boolean expressions ›</a></li>
+</ul>
+  <header class="post-header">
+    <h1 class="post-title">Introduction to IMP and to Hoare Logic</h1>
+  </header>
+
+  <div class="post-content">
+    <!--
+<pre class="Agda"><a id="96" class="Keyword">module</a> <a id="103" href="Chapter.Imp.Introduction.html" class="Module">Chapter.Imp.Introduction</a> <a id="128" class="Keyword">where</a>
+</pre>-->
+
+<h2 id="the-language-imp">The language IMP</h2>
+
+<p>To study the verification problem in case of imperative programs we use a tiny programming
+language called <strong>IMP</strong> or sometimes <strong>While</strong> in the literature (see below for some references).
+The language has just one data type <code class="language-plaintext highlighter-rouge">Val = ℕ</code>, namely the natural numbers, but two sorts
+of expressions, that is <em>arithmetic</em> and <em>boolean expressions</em>.</p>
+
+<p>An IMP program is a <em>command</em>, whose syntax is defined by the grammar:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Com ∋ c, c' ::= SKIP | x := a | c :: c' | IF b THEN c ELSE c' | WHILE b DO c
+</code></pre></div></div>
+
+<p>This syntax is close to actual programming languages like Pascal or C, but for the
+command <code class="language-plaintext highlighter-rouge">SKIP</code>, that simply terminates the exacution without any side effect, and the
+notation <code class="language-plaintext highlighter-rouge">c :: c'</code> for the more familiar <code class="language-plaintext highlighter-rouge">c ; c'</code>, forced to us by Agda.</p>
+
+<p>The meaning of an IMP command is some transformation of the memory;
+a <em>memory state</em>, or just a <em>state</em>, is simply represented as
+a map <code class="language-plaintext highlighter-rouge">s : State</code> where <code class="language-plaintext highlighter-rouge">State = Varname → Val</code>, assigning a value to each variable identifier
+in <code class="language-plaintext highlighter-rouge">Varname</code>.
+The formal definition of such meanings is given here in terms of their <em>operational
+semantics</em>, that is based on some sort of symbolic execution of the commands.</p>
+
+<p>We describe the operational semantics of IMP in two ways. The first one is by means of
+the relation <code class="language-plaintext highlighter-rouge">⦅ c , s ⦆ ⇒ t</code>, where <code class="language-plaintext highlighter-rouge">⦅_,_⦆ ⇒ _ ⊆ (Com × State) × State</code>. Such relation
+is called <strong>big-step</strong> operational semantics because it relates the initial to
+the final state of a terminating execution of a command:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  ⦅ c , s ⦆ ⇒ t if the execution of c when started in the state s terminates
+                yielding the state t
+</code></pre></div></div>
+
+<p>A second relation we consider is the <strong>small-step</strong> semantics, which is a relation
+<code class="language-plaintext highlighter-rouge">⦅ c , s ⦆ ⟶ ⦅ c' , t ⦆</code>, where <code class="language-plaintext highlighter-rouge">⦅_,_⦆ ⟶ ⦅_,_⦆ ⊆ (Com × State) × (Com × State)</code>,
+whose meaning is</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> ⦅ c , s ⦆ ⟶ ⦅ c' , t ⦆ if the execution of the "first" command in c
+                leads in one step from state s to state t, and c' is the part of c
+                that remains to be executed (its "continuation")
+</code></pre></div></div>
+
+<p>where of course we shall make precise, among other things, which part of a command <code class="language-plaintext highlighter-rouge">c</code> is
+its <em>first</em> one and which is its <em>continuation</em>.</p>
+
+<p>As we shall see, both these relations are <em>deterministic</em> that is they are functional, in the sense that
+if <code class="language-plaintext highlighter-rouge">⦅ c , s ⦆ ⇒ t</code> then such a <code class="language-plaintext highlighter-rouge">t</code> is unique; similarly, if <code class="language-plaintext highlighter-rouge">⦅ c , s ⦆ ⟶ ⦅ c' , t ⦆</code>
+then <code class="language-plaintext highlighter-rouge">⦅ c' , t ⦆</code> is uniquely determined by <code class="language-plaintext highlighter-rouge">⦅ c , s ⦆</code>.</p>
+
+<p>Although different, the two semantics are related as stated in the theorem:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> ∀ c s t . ⦅ c , s ⦆ ⇒ t &lt;==&gt; ⦅ c , s ⦆ ⟶* ⦅ SKIP , t ⦆
+</code></pre></div></div>
+
+<p>where <code class="language-plaintext highlighter-rouge">⟶*</code> is the least reflexive and transitive relation including <code class="language-plaintext highlighter-rouge">⟶</code>.</p>
+
+<h2 id="the-floyd-hoare-logic">The Floyd-Hoare logic</h2>
+
+<p>The second ingredient for program verification is a language of <em>specifications</em>. We adopt
+<strong>assertions</strong>, that is formulas of first order arithmetic, enriched with program variables
+from IMP. In our formalization an assertion <code class="language-plaintext highlighter-rouge">P : Assn</code>, where <code class="language-plaintext highlighter-rouge">Assn = State → Set</code>, is a predicate
+of states; a pair <code class="language-plaintext highlighter-rouge">P, Q</code> of assertions are <em>pre-condition</em> and <em>post-condition</em> of a
+command <code class="language-plaintext highlighter-rouge">c</code> in the <em>triple</em> <code class="language-plaintext highlighter-rouge">[ P ] c [ Q ]</code> (written <code class="language-plaintext highlighter-rouge">{P} c {Q}</code> in the literature,
+a notation which is not permitted by Agda, alas) respectively.</p>
+
+<p>A triple <code class="language-plaintext highlighter-rouge">[ P ] c [ Q ]</code> is <em>valid</em>, written <code class="language-plaintext highlighter-rouge">|= [ P ] c [ Q ]</code>, if</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  For any states s and t if P s and  ⦅ c , s ⦆ ⇒ t then Q t
+</code></pre></div></div>
+
+<p>or in symbols:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  ∀ s t . P s ∧ ⦅ c , s ⦆ ⇒ t ==&gt; Q t
+</code></pre></div></div>
+
+<p>This is known as the <em>partial correctness criterion</em>, since the pre-condition <code class="language-plaintext highlighter-rouge">P s</code> is not
+required to imply the termination of the execution of <code class="language-plaintext highlighter-rouge">c</code> starting with <code class="language-plaintext highlighter-rouge">s</code>.</p>
+
+<p>Now, the notion of a valid triple is semantic in nature, as it relies on the (operational)
+semantics formalized by the big-step relation; worse than this, it is universally quantified
+over states, so that proving something about commands solely on the ground of operational
+semantics involves more abstract reasoning tools than just considering particular
+executions.</p>
+
+<p>What we need is the power of logic, for which we choose Hoare logic.
+Hoare logic is a formal system deriving judgements
+we shall write as <code class="language-plaintext highlighter-rouge">|- [ P ] c [ Q ]</code>, whose derivations are finite trees of triples and
+predicate implications. Of such a logic
+we shall be able to prove that it is <em>sound</em>, in the sense that</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  |- [ P ] c [ Q ]  ==&gt;  |= [ P ] c [ Q ]          (Soundness Theorem)
+</code></pre></div></div>
+
+<p>Vice versa we shall prove that, provided that all implications among assertions that are
+needed in a proof are provable within our system Agda, Hoare logic is also <em>complete</em>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  |= [ P ] c [ Q ]  ==&gt;  |- [ P ] c [ Q ]          (Relative Completeness Theorem) 
+</code></pre></div></div>
+
+<h2 id="toward-automation">Toward automation</h2>
+
+<p>Using Hoare logic to verify that a program meets its <em>contract</em>, namely some pre and post-conditions,
+may be awesome. This can be mitigated if we are able to factor out purely logical steps from a proof
+based on Hoare logic, since all other steps can be patterned after the syntactical structure of
+the program and hence automated.
+On the other hand the progress made by automated theorem provers, like the
+<a href="https://en.wikipedia.org/wiki/Satisfiability_modulo_theories">SMT solvers</a>,
+can be of great help when checking the logical correctness of the <strong>verification conditions</strong> which
+are the product of such a factorization.</p>
+
+<p>In the last chapter we shall introduce a variant of IMP such that <code class="language-plaintext highlighter-rouge">WHILE</code> commands can be decorated
+by assertions that are supposed to be their <em>loop invariants</em>. Of course it is the responsibility of the
+programmer to write the proper invariants; to verify that this is actually the case we will show
+that it sufficies to prove that the predicate <code class="language-plaintext highlighter-rouge">vc C Q</code>, automatically
+computable from the post-condition <code class="language-plaintext highlighter-rouge">Q</code> and the annotated command <code class="language-plaintext highlighter-rouge">C</code>, holds to conclude that if
+<code class="language-plaintext highlighter-rouge">P</code> implies the predicate <code class="language-plaintext highlighter-rouge">pre C Q</code>, that is also computable, then <code class="language-plaintext highlighter-rouge">|- [ P ] strip C [ Q ]</code> is
+derivable in Hoare logic,
+where <code class="language-plaintext highlighter-rouge">strip C</code> is just the command obtained from the decorated program <code class="language-plaintext highlighter-rouge">C</code> by deleting all
+annotations.</p>
+
+<h2 id="references-and-further-readings">References and further readings</h2>
+
+<p>The language IMP, its semantics and Hoare logic are treated in depth in [1], together with
+its denotational semantics, a topic which is not addressed in our text.
+The same topics, even considering 
+some extensions of the language (there called <em>While</em>) are treated in [2], with a chapter dedicated
+to some techniques of static analysis.</p>
+
+<p>In spite of its simplicity, the language IMP
+is Turing complete; indeed a sublanguage of it is considered in [3] in place of Turing machines
+to introduce the basic results of computability theory.</p>
+
+<p>The book [4] has been the basis of our work in this last part of the book. It is a concise exposition
+of IMP and Hoare logic (with other topics), where all the definitions and results have been checked
+using the proof assistant Isabel. The proof assistant and the underlying logic constitute the main
+differences with the present work. While Isabel is based on Higher Order Logic, which is
+classical logic at higher types, Agda is an implementation of intuitionistic type theory; moreover
+Isabel exclusively uses tacticals to prove theorems, and no proof object is produced. On the
+contrary the enphasis of the present work is on (constructive) proofs, that with respect to [4]
+have been completely reworked.</p>
+
+<ol>
+  <li>G. Winskel, <em>The Formal Semantics of Programming Languages</em>, The MIT Press</li>
+  <li>H. R. Nielson &amp; F. Nielson,
+<a href="http://www.cs.ru.nl/~herman/onderwijs/semantics2019/wiley.pdf"><em>Semantics with Applications</em></a>, Wiley</li>
+  <li>A. J. Kfoury, R. N. Moll &amp; R. A. Arbib, <em>A Programming Approach to Computability</em>, Springer</li>
+  <li>T. Nipkow &amp; G. Klein, <a href="http://concrete-semantics.org/"><em>Concrete Semantics</em></a>, Springer</li>
+</ol>
+
+  </div>
+  <ul class="menu">
+  <li><a href="Main.html">‹ Table of contents</a></li>
+  <li>
+    <a href="Chapter.Imp.AexpBexp.html">Arithmetic and boolean expressions ›</a></li>
+</ul>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+  <div class="wrapper">
+    <!-- <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"> -->
+    <!--   <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png"/> -->
+    <!-- </a> -->
+    2022-2023
+    <a href="https://boystrange.github.io">Luca Padovani</a>
+    and <a href="http://www.di.unito.it/~deligu/">Ugo de'Liguoro</a>.
+    Page generated on 20 Sep 2023.
+  </div>
+</footer>
+</body>
+
+</html>

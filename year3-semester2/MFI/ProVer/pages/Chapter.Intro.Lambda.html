@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Types and functions | Introduction to Program Verification in Agda</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Types and functions" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="Introduction to Program Verification in Agda" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Types and functions" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Types and functions","url":"/pages/Chapter.Intro.Lambda.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/Agda.css">
+  <script src="../assets/js/mathjax.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="../assets/js/codereveal.js"></script>
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Introduction to Program Verification in Agda" /><!-- <script src="/assets/js/clipboard.min.js"></script> -->
+  <!-- <script src="/assets/js/codeselect.js"></script> -->
+</head>
+<body>
+
+<header class="site-header" role="banner">
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="../index.html">Introduction to Program Verification in Agda</a>
+    
+
+    <nav class="site-nav">
+      <a href="https://agda.readthedocs.io/en/latest/">AGDA DOCS</a>
+    </nav>
+  </div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+  <ul class="menu">
+  <li><a href="Main.html">‹ Table of contents</a></li>
+  <li>
+    <a href="Chapter.Intro.Bool.html">Inductive data types: the Booleans ›</a></li>
+</ul>
+  <header class="post-header">
+    <h1 class="post-title">Types and functions</h1>
+  </header>
+
+  <div class="post-content">
+    <pre class="Agda"><a id="67" class="Keyword">module</a> <a id="74" href="Chapter.Intro.Lambda.html" class="Module">Chapter.Intro.Lambda</a> <a id="95" class="Keyword">where</a>
+</pre>
+<h2 id="imports">Imports</h2>
+
+<p>To try out the examples discussed in this chapter and to solve the
+proposed exercises it is necessary to import the <code class="language-plaintext highlighter-rouge">Nat</code> module, which
+defines the natural numbers and some basic operations on them. We
+will see how natural numbers are defined in a <a href="Chapter.Intro.NaturalNumbers.html">dedicated
+chapter</a>. For the time being, we
+simply import the module and make its content accessible by means of
+the following clause.</p>
+
+<pre class="Agda"><a id="541" class="Keyword">open</a> <a id="546" class="Keyword">import</a> <a id="553" href="Library.Nat.html" class="Module">Library.Nat</a>
+</pre>
+<h2 id="simple-types">Simple types</h2>
+
+<p>Agda is a strongly typed programming language and every term of the
+language must be <strong>well typed</strong> in order to be considered by
+Agda. For now we only consider a small set of <strong>simple types</strong>:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">ℕ</code> stands for the type of <strong>natural numbers</strong>;</li>
+  <li>if <code class="language-plaintext highlighter-rouge">A</code> and <code class="language-plaintext highlighter-rouge">B</code> are types, then <code class="language-plaintext highlighter-rouge">(A -&gt; B)</code> is the type of
+<strong>functions</strong> that, when applied to an argument of type <code class="language-plaintext highlighter-rouge">A</code>, yield a
+result of type <code class="language-plaintext highlighter-rouge">B</code>.</li>
+</ul>
+
+<p>To limit the amount of parentheses we have to write in types and to
+improve readability, we adopt the following conventions:</p>
+
+<ul>
+  <li>we omit topmost parentheses, so that <code class="language-plaintext highlighter-rouge">A -&gt; B</code> stands for <code class="language-plaintext highlighter-rouge">(A -&gt; B)</code>;</li>
+  <li>we assume that <code class="language-plaintext highlighter-rouge">-&gt;</code> associates to the <strong>right</strong>, so that e.g. <code class="language-plaintext highlighter-rouge">A
+-&gt; B -&gt; C</code> stands for <code class="language-plaintext highlighter-rouge">A -&gt; (B -&gt; C)</code> and not for <code class="language-plaintext highlighter-rouge">(A -&gt; B) -&gt; C</code>.</li>
+</ul>
+
+<h2 id="terms">Terms</h2>
+
+<p>We assume the existence of an infinite set of <strong>term variables</strong> <code class="language-plaintext highlighter-rouge">{
+x, y, z, ... }</code> often called simply variables. Agda is a strongly
+typed language, in the sense that it only considers (and evaluates)
+terms that are <strong>well typed</strong> according to a specific set of
+<strong>typing rules</strong>. In describing the syntax of terms, we also
+informally describe the typing rules that they must obey and how
+their type is determined.</p>
+
+<ul>
+  <li>A variable of type <code class="language-plaintext highlighter-rouge">A</code> is also a term of type <code class="language-plaintext highlighter-rouge">A</code>.</li>
+  <li>If <code class="language-plaintext highlighter-rouge">x</code> is a variable, <code class="language-plaintext highlighter-rouge">A</code> is a type and <code class="language-plaintext highlighter-rouge">M</code> is a term of type <code class="language-plaintext highlighter-rouge">B</code>
+assuming that <code class="language-plaintext highlighter-rouge">x</code> has type <code class="language-plaintext highlighter-rouge">A</code>, then <code class="language-plaintext highlighter-rouge">(λ (x : A) -&gt; M)</code> is a term
+of type <code class="language-plaintext highlighter-rouge">A -&gt; B</code> called <strong>abstraction</strong> and representing a function
+that produces <code class="language-plaintext highlighter-rouge">M</code> when applied to <code class="language-plaintext highlighter-rouge">x</code>. We say that <code class="language-plaintext highlighter-rouge">x</code> is the
+<strong>argument</strong> of the function and that <code class="language-plaintext highlighter-rouge">M</code> is its <strong>body</strong>.</li>
+  <li>If <code class="language-plaintext highlighter-rouge">M</code> is a term of type <code class="language-plaintext highlighter-rouge">A -&gt; B</code> and <code class="language-plaintext highlighter-rouge">N</code> is a term of type <code class="language-plaintext highlighter-rouge">A</code>,
+then <code class="language-plaintext highlighter-rouge">(M N)</code> is a term of type <code class="language-plaintext highlighter-rouge">B</code> called <strong>application</strong>
+representing the application of (the function) <code class="language-plaintext highlighter-rouge">M</code> to (the
+argument) <code class="language-plaintext highlighter-rouge">N</code>. It is useful to think of function application as of
+an invisible operator placed in between <code class="language-plaintext highlighter-rouge">M</code> and <code class="language-plaintext highlighter-rouge">N</code>.</li>
+</ul>
+
+<p>We will introduce new terms in the following chapters. For the time
+being, since we have imported the <code class="language-plaintext highlighter-rouge">Nat</code> module from the library, a
+number of terms defined therein are also available. In particular:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">zero</code> of type <code class="language-plaintext highlighter-rouge">ℕ</code> represents the natural number zero;</li>
+  <li><code class="language-plaintext highlighter-rouge">succ</code> of type <code class="language-plaintext highlighter-rouge">ℕ -&gt; ℕ</code> is a function that, applied to a natural
+number, yields its successor.</li>
+</ul>
+
+<p>The usual positional notation for natural numbers is also available,
+so that <code class="language-plaintext highlighter-rouge">0</code> can be used as abbreviation for <code class="language-plaintext highlighter-rouge">zero</code>, <code class="language-plaintext highlighter-rouge">2</code> can be used
+for abbreviation for <code class="language-plaintext highlighter-rouge">(succ (succ zero))</code> and <code class="language-plaintext highlighter-rouge">42</code> can be used for
+abbreviation for 42 applications of <code class="language-plaintext highlighter-rouge">succ</code> to <code class="language-plaintext highlighter-rouge">zero</code>.</p>
+
+<p>As for types, also for terms we adopt some syntactic conventions to
+improve readability.</p>
+
+<ul>
+  <li>We omit topmost parentheses, so that e.g. <code class="language-plaintext highlighter-rouge">M N</code> stands for <code class="language-plaintext highlighter-rouge">(M
+N)</code>.</li>
+  <li>We omit the type of an argument when it is unimportant or clear
+from the context. For example, we may write <code class="language-plaintext highlighter-rouge">λ x -&gt; x</code> instead of
+<code class="language-plaintext highlighter-rouge">λ (x : A) -&gt; x</code>.</li>
+  <li>We often collapse nested abstractions into one, so that e.g. <code class="language-plaintext highlighter-rouge">λ x
+y z -&gt; M</code> stands for <code class="language-plaintext highlighter-rouge">λ x -&gt; λ y -&gt; λ z -&gt; M</code>.</li>
+  <li>We assume that the body of an abstraction extends as much as
+possible to the right. For example, <code class="language-plaintext highlighter-rouge">λ x y -&gt; x y</code> stands for <code class="language-plaintext highlighter-rouge">λ x
+y -&gt; (x y)</code> and not for <code class="language-plaintext highlighter-rouge">(λ x y -&gt; x) y</code>.</li>
+  <li>We assume that application is <strong>left associative</strong>, so that <code class="language-plaintext highlighter-rouge">M₁ M₂
+M₃</code> stands for <code class="language-plaintext highlighter-rouge">(M₁ M₂) M₃</code> and not for <code class="language-plaintext highlighter-rouge">M₁ (M₂ M₃)</code>.</li>
+</ul>
+
+<h2 id="definitions">Definitions</h2>
+
+<p>An Agda program consists mainly of <strong>definitions</strong> with which we
+give names to terms and we specify their type. For example, the
+following two lines specify that <code class="language-plaintext highlighter-rouge">f</code> is a function of type <code class="language-plaintext highlighter-rouge">ℕ -&gt; ℕ</code>
+that maps $x$ to $x^2 + 1$:</p>
+
+<pre class="Agda"><a id="f"></a><a id="4041" href="Chapter.Intro.Lambda.html#4041" class="Function">f</a> <a id="4043" class="Symbol">:</a> <a id="4045" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="4047" class="Symbol">-&gt;</a> <a id="4050" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="4052" href="Chapter.Intro.Lambda.html#4041" class="Function">f</a> <a id="4054" class="Symbol">=</a> <a id="4056" class="Symbol">λ</a> <a id="4058" href="Chapter.Intro.Lambda.html#4058" class="Bound">x</a> <a id="4060" class="Symbol">-&gt;</a> <a id="4063" href="Chapter.Intro.Lambda.html#4058" class="Bound">x</a> <a id="4065" href="Library.Nat.html#352" class="Function Operator">^</a> <a id="4067" class="Number">2</a> <a id="4069" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="4071" class="Number">1</a>
+</pre>
+<p>The first line provides the <strong>signature</strong> of <code class="language-plaintext highlighter-rouge">f</code>. Top-level
+definitions like this one must always be accompanied by a
+signature. The second line provides the <strong>definition</strong> of <code class="language-plaintext highlighter-rouge">f</code> with
+which we establish that the name <code class="language-plaintext highlighter-rouge">f</code> is <strong>definitionally</strong> the same
+as the abstraction <code class="language-plaintext highlighter-rouge">λ x - x ^ 2 + 1</code>. That is, for Agda the name <code class="language-plaintext highlighter-rouge">f</code>
+and the term <code class="language-plaintext highlighter-rouge">λ x -&gt; x ^ 2 + 1</code> are <strong>equal</strong>. Note that we omit the
+type of the argument <code class="language-plaintext highlighter-rouge">x</code> for this abstraction: Agda is able to
+figure out that <code class="language-plaintext highlighter-rouge">x</code> has type <code class="language-plaintext highlighter-rouge">ℕ</code> from both the signature of <code class="language-plaintext highlighter-rouge">f</code> and
+the fact that the operators <code class="language-plaintext highlighter-rouge">^</code> and <code class="language-plaintext highlighter-rouge">+</code> concern natural
+numbers. Speaking of these operators, <code class="language-plaintext highlighter-rouge">^</code> and <code class="language-plaintext highlighter-rouge">+</code> are defined in the
+<code class="language-plaintext highlighter-rouge">Nat</code> module by means of equations analogous to the one defining
+<code class="language-plaintext highlighter-rouge">f</code>. Here, we take them for granted. In this document, it is
+possible to <em>click</em> on any colored symbol to reach its definition.</p>
+
+<p>A note on <strong>spacing</strong> in Agda: unlike most programming languages,
+Agda allows almost any character to be part of an identifier. For
+example, <code class="language-plaintext highlighter-rouge">^</code> and <code class="language-plaintext highlighter-rouge">+</code> are plain Agda identifiers just like <code class="language-plaintext highlighter-rouge">f</code> and
+<code class="language-plaintext highlighter-rouge">ℕ</code>. If we write <code class="language-plaintext highlighter-rouge">x^2</code> (without spaces around <code class="language-plaintext highlighter-rouge">^</code>), Agda considers
+this as a single identifier (for which there is no definition).</p>
+
+<p>By loading the program using <code class="language-plaintext highlighter-rouge">C-c C-l</code>, Agda verifies that <code class="language-plaintext highlighter-rouge">f</code> is
+well typed and that its type is consistent with the one provided in
+its signature.  We can verify the behavior of <code class="language-plaintext highlighter-rouge">f</code> by applying it to
+some natural numbers. For example, if we enter <code class="language-plaintext highlighter-rouge">C-c C-n f 2</code> we
+obtain <code class="language-plaintext highlighter-rouge">5</code> as result. The command <code class="language-plaintext highlighter-rouge">C-c C-n</code> asks Agda to <em>evaluate</em>
+(technically, to <em>normalize</em>), the provided expression.</p>
+
+<p>When defining abstractions, Agda provides an alternative, more
+convenient notation with which argument and body of the function are
+separated by the symbol <code class="language-plaintext highlighter-rouge">=</code> . For example, an equivalent way of
+defining <code class="language-plaintext highlighter-rouge">f</code> is</p>
+
+<pre class="Agda"><a id="f₁"></a><a id="5857" href="Chapter.Intro.Lambda.html#5857" class="Function">f₁</a> <a id="5860" class="Symbol">:</a> <a id="5862" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="5864" class="Symbol">-&gt;</a> <a id="5867" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="5869" href="Chapter.Intro.Lambda.html#5857" class="Function">f₁</a> <a id="5872" href="Chapter.Intro.Lambda.html#5872" class="Bound">x</a> <a id="5874" class="Symbol">=</a> <a id="5876" href="Chapter.Intro.Lambda.html#5872" class="Bound">x</a> <a id="5878" href="Library.Nat.html#352" class="Function Operator">^</a> <a id="5880" class="Number">2</a> <a id="5882" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="5884" class="Number">1</a>
+</pre>
+<p>which can be read as “<code class="language-plaintext highlighter-rouge">f₁</code> applied to <code class="language-plaintext highlighter-rouge">x</code> is equal to <code class="language-plaintext highlighter-rouge">x ^ 2 +
+1</code>”. We have named this alternative definition of the function <code class="language-plaintext highlighter-rouge">f₁</code>
+instead of <code class="language-plaintext highlighter-rouge">f</code> to avoid a <em>name clash</em>: there cannot be two
+definitions with the same name in the same Agda file. Here and in
+the following we will use indices when providing multiple versions
+of the same definition.</p>
+
+<h2 id="multi-argument-and-higher-order-functions">Multi-argument and higher-order functions</h2>
+
+<p>Strictly speaking, all Agda functions have exactly one argument. The
+usual way of representing multi-argument functions in a functional
+language like Agda is by means of functions that yield other
+functions as result. For example, <code class="language-plaintext highlighter-rouge">g</code> below is defined as a function
+that maps $x$ to a function that maps $y$ to $x^2 + 2xy + 1$.</p>
+
+<pre class="Agda"><a id="g"></a><a id="6619" href="Chapter.Intro.Lambda.html#6619" class="Function">g</a> <a id="6621" class="Symbol">:</a> <a id="6623" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="6625" class="Symbol">-&gt;</a> <a id="6628" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="6630" class="Symbol">-&gt;</a> <a id="6633" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="6635" href="Chapter.Intro.Lambda.html#6619" class="Function">g</a> <a id="6637" class="Symbol">=</a> <a id="6639" class="Symbol">λ</a> <a id="6641" href="Chapter.Intro.Lambda.html#6641" class="Bound">x</a> <a id="6643" class="Symbol">-&gt;</a> <a id="6646" class="Symbol">λ</a> <a id="6648" href="Chapter.Intro.Lambda.html#6648" class="Bound">y</a> <a id="6650" class="Symbol">-&gt;</a> <a id="6653" href="Chapter.Intro.Lambda.html#6641" class="Bound">x</a> <a id="6655" href="Library.Nat.html#352" class="Function Operator">^</a> <a id="6657" class="Number">2</a> <a id="6659" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="6661" class="Number">2</a> <a id="6663" href="Library.Nat.html#293" class="Function Operator">*</a> <a id="6665" href="Chapter.Intro.Lambda.html#6641" class="Bound">x</a> <a id="6667" href="Library.Nat.html#293" class="Function Operator">*</a> <a id="6669" href="Chapter.Intro.Lambda.html#6648" class="Bound">y</a> <a id="6671" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="6673" class="Number">1</a>
+</pre>
+<p>Equivalently, <code class="language-plaintext highlighter-rouge">g</code> can be written as follows:</p>
+
+<pre class="Agda"><a id="g₁"></a><a id="6730" href="Chapter.Intro.Lambda.html#6730" class="Function">g₁</a> <a id="6733" class="Symbol">:</a> <a id="6735" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="6737" class="Symbol">-&gt;</a> <a id="6740" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="6742" class="Symbol">-&gt;</a> <a id="6745" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="6747" href="Chapter.Intro.Lambda.html#6730" class="Function">g₁</a> <a id="6750" href="Chapter.Intro.Lambda.html#6750" class="Bound">x</a> <a id="6752" href="Chapter.Intro.Lambda.html#6752" class="Bound">y</a> <a id="6754" class="Symbol">=</a> <a id="6756" href="Chapter.Intro.Lambda.html#6750" class="Bound">x</a> <a id="6758" href="Library.Nat.html#352" class="Function Operator">^</a> <a id="6760" class="Number">2</a> <a id="6762" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="6764" class="Number">2</a> <a id="6766" href="Library.Nat.html#293" class="Function Operator">*</a> <a id="6768" href="Chapter.Intro.Lambda.html#6750" class="Bound">x</a> <a id="6770" href="Library.Nat.html#293" class="Function Operator">*</a> <a id="6772" href="Chapter.Intro.Lambda.html#6752" class="Bound">y</a> <a id="6774" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="6776" class="Number">1</a>
+</pre>
+<p>We can use <code class="language-plaintext highlighter-rouge">C-c C-n</code> to verify that <code class="language-plaintext highlighter-rouge">g 2 3</code> evaluates to <code class="language-plaintext highlighter-rouge">17</code>. Since
+function application is left associative, <code class="language-plaintext highlighter-rouge">g 2 3</code> is the same as <code class="language-plaintext highlighter-rouge">(g
+2) 3</code>. That is, we first apply <code class="language-plaintext highlighter-rouge">g</code> to <code class="language-plaintext highlighter-rouge">2</code> to obtain the function</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>λ y -&gt; 2 ^ 2 + 2 * 2 * y + 1
+</code></pre></div></div>
+
+<p>and then we apply this function to <code class="language-plaintext highlighter-rouge">3</code>, to obtain
+<code class="language-plaintext highlighter-rouge">2 ^ 2 + 2 * 2 * 3 + 1</code> that is <code class="language-plaintext highlighter-rouge">17</code>.</p>
+
+<p>As in most functional programming languages, functions are
+first-class entities that can be provided as arguments and returned
+as results of other functions. For example, the function</p>
+
+<pre class="Agda"><a id="twice"></a><a id="7299" href="Chapter.Intro.Lambda.html#7299" class="Function">twice</a> <a id="7305" class="Symbol">:</a> <a id="7307" class="Symbol">(</a><a id="7308" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="7310" class="Symbol">-&gt;</a> <a id="7313" href="Library.Nat.html#32" class="Datatype">ℕ</a><a id="7314" class="Symbol">)</a> <a id="7316" class="Symbol">-&gt;</a> <a id="7319" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="7321" class="Symbol">-&gt;</a> <a id="7324" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="7326" href="Chapter.Intro.Lambda.html#7299" class="Function">twice</a> <a id="7332" href="Chapter.Intro.Lambda.html#7332" class="Bound">f</a> <a id="7334" href="Chapter.Intro.Lambda.html#7334" class="Bound">x</a> <a id="7336" class="Symbol">=</a> <a id="7338" href="Chapter.Intro.Lambda.html#7332" class="Bound">f</a> <a id="7340" class="Symbol">(</a><a id="7341" href="Chapter.Intro.Lambda.html#7332" class="Bound">f</a> <a id="7343" href="Chapter.Intro.Lambda.html#7334" class="Bound">x</a><a id="7344" class="Symbol">)</a>
+</pre>
+<p>applied to a function <code class="language-plaintext highlighter-rouge">f</code> and an argument <code class="language-plaintext highlighter-rouge">x</code> applies <code class="language-plaintext highlighter-rouge">f</code> to <code class="language-plaintext highlighter-rouge">x</code>
+twice. Evaluating <code class="language-plaintext highlighter-rouge">twice f 2</code> where <code class="language-plaintext highlighter-rouge">f</code> is the function defined
+above yields <code class="language-plaintext highlighter-rouge">26</code>.</p>
+
+<h2 id="exercises">Exercises</h2>
+
+<ol>
+  <li>Define at least six different versions of the function that
+computes the successor of a natural number.</li>
+  <li>Define a function <code class="language-plaintext highlighter-rouge">poly₁</code> that, applied to a natural number $x$,
+yields $2x^2$.</li>
+  <li>Define a function <code class="language-plaintext highlighter-rouge">poly₂</code> that, applied to two natural numbers
+$x$ and $y$, yields $2(x^3 + y^2)$.</li>
+  <li>Which of the following terms are well typed? Use Agda to verify
+whether your answers are correct.
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">λ (x : ℕ -&gt; ℕ -&gt; ℕ) (y : ℕ -&gt; ℕ) -&gt; x y</code></li>
+      <li><code class="language-plaintext highlighter-rouge">λ (x : (ℕ -&gt; ℕ) -&gt; ℕ) (y : ℕ) -&gt; x y</code></li>
+      <li><code class="language-plaintext highlighter-rouge">λ (x : ℕ -&gt; ℕ -&gt; ℕ) (y : ℕ) -&gt; x x y</code></li>
+      <li><code class="language-plaintext highlighter-rouge">λ (x : ℕ -&gt; ℕ -&gt; ℕ) (y : ℕ) -&gt; x (x y)</code></li>
+      <li><code class="language-plaintext highlighter-rouge">λ (x : ℕ -&gt; ℕ -&gt; ℕ) (y : ℕ) -&gt; x y y</code></li>
+    </ul>
+  </li>
+</ol>
+
+<pre class="Agda solution"><a id="8149" class="Comment">-- EXERCISE 1</a>
+
+<a id="succ₁"></a><a id="8164" href="Chapter.Intro.Lambda.html#8164" class="Function">succ₁</a> <a id="8170" class="Symbol">:</a> <a id="8172" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="8174" class="Symbol">-&gt;</a> <a id="8177" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="8179" href="Chapter.Intro.Lambda.html#8164" class="Function">succ₁</a> <a id="8185" class="Symbol">=</a> <a id="8187" href="Library.Nat.html#59" class="InductiveConstructor">succ</a>
+
+<a id="succ₂"></a><a id="8193" href="Chapter.Intro.Lambda.html#8193" class="Function">succ₂</a> <a id="8199" class="Symbol">:</a> <a id="8201" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="8203" class="Symbol">-&gt;</a> <a id="8206" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="8208" href="Chapter.Intro.Lambda.html#8193" class="Function">succ₂</a> <a id="8214" href="Chapter.Intro.Lambda.html#8214" class="Bound">x</a> <a id="8216" class="Symbol">=</a> <a id="8218" href="Library.Nat.html#59" class="InductiveConstructor">succ</a> <a id="8223" href="Chapter.Intro.Lambda.html#8214" class="Bound">x</a>
+
+<a id="succ₃"></a><a id="8226" href="Chapter.Intro.Lambda.html#8226" class="Function">succ₃</a> <a id="8232" class="Symbol">:</a> <a id="8234" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="8236" class="Symbol">-&gt;</a> <a id="8239" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="8241" href="Chapter.Intro.Lambda.html#8226" class="Function">succ₃</a> <a id="8247" class="Symbol">=</a> <a id="8249" class="Symbol">λ</a> <a id="8251" href="Chapter.Intro.Lambda.html#8251" class="Bound">x</a> <a id="8253" class="Symbol">-&gt;</a> <a id="8256" href="Chapter.Intro.Lambda.html#8251" class="Bound">x</a> <a id="8258" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="8260" class="Number">1</a>
+
+<a id="succ₄"></a><a id="8263" href="Chapter.Intro.Lambda.html#8263" class="Function">succ₄</a> <a id="8269" class="Symbol">:</a> <a id="8271" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="8273" class="Symbol">-&gt;</a> <a id="8276" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="8278" href="Chapter.Intro.Lambda.html#8263" class="Function">succ₄</a> <a id="8284" class="Symbol">=</a> <a id="8286" class="Symbol">λ</a> <a id="8288" href="Chapter.Intro.Lambda.html#8288" class="Bound">x</a> <a id="8290" class="Symbol">-&gt;</a> <a id="8293" class="Number">1</a> <a id="8295" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="8297" href="Chapter.Intro.Lambda.html#8288" class="Bound">x</a>
+
+<a id="succ₅"></a><a id="8300" href="Chapter.Intro.Lambda.html#8300" class="Function">succ₅</a> <a id="8306" class="Symbol">:</a> <a id="8308" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="8310" class="Symbol">-&gt;</a> <a id="8313" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="8315" href="Chapter.Intro.Lambda.html#8300" class="Function">succ₅</a> <a id="8321" href="Chapter.Intro.Lambda.html#8321" class="Bound">x</a> <a id="8323" class="Symbol">=</a> <a id="8325" href="Chapter.Intro.Lambda.html#8321" class="Bound">x</a> <a id="8327" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="8329" class="Number">1</a>
+
+<a id="succ₆"></a><a id="8332" href="Chapter.Intro.Lambda.html#8332" class="Function">succ₆</a> <a id="8338" class="Symbol">:</a> <a id="8340" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="8342" class="Symbol">-&gt;</a> <a id="8345" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="8347" href="Chapter.Intro.Lambda.html#8332" class="Function">succ₆</a> <a id="8353" href="Chapter.Intro.Lambda.html#8353" class="Bound">x</a> <a id="8355" class="Symbol">=</a> <a id="8357" class="Number">1</a> <a id="8359" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="8361" href="Chapter.Intro.Lambda.html#8353" class="Bound">x</a>
+
+<a id="8364" class="Comment">-- EXERCISE 2</a>
+
+<a id="poly₂"></a><a id="8379" href="Chapter.Intro.Lambda.html#8379" class="Function">poly₂</a> <a id="8385" class="Symbol">:</a> <a id="8387" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="8389" class="Symbol">-&gt;</a> <a id="8392" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="8394" href="Chapter.Intro.Lambda.html#8379" class="Function">poly₂</a> <a id="8400" href="Chapter.Intro.Lambda.html#8400" class="Bound">x</a> <a id="8402" class="Symbol">=</a> <a id="8404" class="Number">2</a> <a id="8406" href="Library.Nat.html#293" class="Function Operator">*</a> <a id="8408" href="Chapter.Intro.Lambda.html#8400" class="Bound">x</a> <a id="8410" href="Library.Nat.html#352" class="Function Operator">^</a> <a id="8412" class="Number">2</a>
+
+<a id="poly₃"></a><a id="8415" href="Chapter.Intro.Lambda.html#8415" class="Function">poly₃</a> <a id="8421" class="Symbol">:</a> <a id="8423" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="8425" class="Symbol">-&gt;</a> <a id="8428" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="8430" class="Symbol">-&gt;</a> <a id="8433" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="8435" href="Chapter.Intro.Lambda.html#8415" class="Function">poly₃</a> <a id="8441" href="Chapter.Intro.Lambda.html#8441" class="Bound">x</a> <a id="8443" href="Chapter.Intro.Lambda.html#8443" class="Bound">y</a> <a id="8445" class="Symbol">=</a> <a id="8447" class="Number">2</a> <a id="8449" href="Library.Nat.html#293" class="Function Operator">*</a> <a id="8451" class="Symbol">(</a><a id="8452" href="Chapter.Intro.Lambda.html#8441" class="Bound">x</a> <a id="8454" href="Library.Nat.html#352" class="Function Operator">^</a> <a id="8456" class="Number">3</a> <a id="8458" href="Library.Nat.html#145" class="Function Operator">+</a> <a id="8460" href="Chapter.Intro.Lambda.html#8443" class="Bound">y</a> <a id="8462" href="Library.Nat.html#352" class="Function Operator">^</a> <a id="8464" class="Number">2</a><a id="8465" class="Symbol">)</a>
+</pre>
+
+  </div>
+  <ul class="menu">
+  <li><a href="Main.html">‹ Table of contents</a></li>
+  <li>
+    <a href="Chapter.Intro.Bool.html">Inductive data types: the Booleans ›</a></li>
+</ul>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+  <div class="wrapper">
+    <!-- <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"> -->
+    <!--   <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png"/> -->
+    <!-- </a> -->
+    2022-2023
+    <a href="https://boystrange.github.io">Luca Padovani</a>
+    and <a href="http://www.di.unito.it/~deligu/">Ugo de'Liguoro</a>.
+    Page generated on 20 Sep 2023.
+  </div>
+</footer>
+</body>
+
+</html>

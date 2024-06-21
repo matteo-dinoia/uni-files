@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Setup | Introduction to Program Verification in Agda</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Setup" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="Introduction to Program Verification in Agda" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Setup" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Setup","url":"/pages/Chapter.Preamble.Setup.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/Agda.css">
+  <script src="../assets/js/mathjax.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="../assets/js/codereveal.js"></script>
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Introduction to Program Verification in Agda" /><!-- <script src="/assets/js/clipboard.min.js"></script> -->
+  <!-- <script src="/assets/js/codeselect.js"></script> -->
+</head>
+<body>
+
+<header class="site-header" role="banner">
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="../index.html">Introduction to Program Verification in Agda</a>
+    
+
+    <nav class="site-nav">
+      <a href="https://agda.readthedocs.io/en/latest/">AGDA DOCS</a>
+    </nav>
+  </div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+  <ul class="menu">
+  <li>
+    <a href="Chapter.Preamble.Demo.html">‹ A taste of Agda</a></li>
+  <li><a href="Main.html">Table of contents ›</a></li>
+</ul>
+  <header class="post-header">
+    <h1 class="post-title">Setup</h1>
+  </header>
+
+  <div class="post-content">
+    <!--
+<pre class="Agda"><a id="65" class="Keyword">module</a> <a id="72" href="Chapter.Preamble.Setup.html" class="Module">Chapter.Preamble.Setup</a> <a id="95" class="Keyword">where</a>
+</pre>-->
+
+<p>The best way to use Agda requires the installation of a suitable
+combination of tools, including at least Agda itself and an editor.
+Unfortunately, the procedure is quite involved and it varies
+substantially depending on the Operating System.  Below are some
+instructions originally written by <a href="https://www.mathstat.dal.ca/~selinger/agda-lectures/">Peter Selinger and Frank
+Fu</a> to install
+Agda and Emacs on <a href="#linux">Linux</a>, <a href="#mac-os">Mac OS</a> and <a href="#windows-10">Windows
+10</a>. At the bottom of the page is a simple <a href="#sanity-check">sanity
+check</a> to verify whether the installation has been
+successful.</p>
+
+<p>Before following these instructions, it may be worth having a look
+at the <a href="https://agda.readthedocs.io/en/latest/getting-started/installation.html#prebuilt-packages">Agda
+documentation</a>
+in case there are more up-to-date and/or specific installation
+procedures for your Operating System. In particular, Agda is known
+to work reasonably well also in combination with <a href="https://code.visualstudio.com">Visual Studio
+Code</a>, which is a more
+“modern-looking” editor compared to Emacs.</p>
+
+<p>There are also two faster ways of getting started using Agda out of
+the box without installing it, but both have shortcomings. One is to
+use <a href="https://agdapad.quasicoherent.io/">this online service</a>. The
+problems of this service are that its availability may not be
+guaranteed in the future and its use may be limited to “simple” Agda
+programs. Another way is to use a <a href="https://zenodo.org/record/4527309">Virtual Box
+image</a> of Ubuntu that comes with
+pre-installed and pre-configured Agda, Emacs and Visual Studio
+Code. Using this image requires a one-time installation of <a href="https://www.virtualbox.org">Virtual
+Box</a>. Installing the image guarantees
+persistent availability of Agda on your machine, but its execution
+may be occasionally slow and/or stuttering because of the
+virtualization.</p>
+
+<h2 id="linux">Linux</h2>
+
+<p>These instructions are for <a href="https://ubuntu.com">Ubuntu</a> and derived
+distributions. Analogous instructions might work on other Linux
+distributions. If you can, make sure that you have a sufficiently
+recent version of Linux. For example, Ubuntu 20.04 comes with Agda
+2.6. Older versions of Ubuntu may come with older Agda versions,
+which may or may not lead to problems.</p>
+
+<ol>
+  <li>
+    <p>Install Emacs using the package manager of your distribution.
+E.g., in Ubuntu, you can enter the following in the terminal.</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt update
+<span class="nb">sudo </span>apt <span class="nb">install </span>emacs
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Install Agda using your package manager.  E.g., in Ubuntu, you
+can enter the followings in the terminal.</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt <span class="nb">install </span>agda
+</code></pre></div>    </div>
+
+    <p>Perhaps you also need this, but with Ubuntu 20.10, this package is
+not needed:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt <span class="nb">install </span>agda-mode
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Create a <code class="language-plaintext highlighter-rouge">.emacs</code> file in your home directory and paste the
+following text to it.</p>
+
+    <div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">load-file</span> <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">coding-system-for-read</span> <span class="ss">'utf-8</span><span class="p">))</span>
+       <span class="p">(</span><span class="nv">shell-command-to-string</span> <span class="s">"agda-mode locate"</span><span class="p">)))</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="mac-os">Mac OS</h2>
+
+<ol>
+  <li>
+    <p>Install <a href="https://brew.sh">Homebrew</a>.</p>
+  </li>
+  <li>
+    <p>Install Emacs. In the terminal, enter the following:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew <span class="nb">install</span> <span class="nt">--cask</span> <span class="nt">--no-quarantine</span> emacs
+</code></pre></div>    </div>
+
+    <p>Note: now you should be able to find Emacs in your <code class="language-plaintext highlighter-rouge">/Application</code>
+folder.  If double clicking the icon does not open it because “Apple
+cannot check it for malicious software”, right-click on the icon and
+click open. After this, Emacs should be opened alright.</p>
+  </li>
+  <li>
+    <p>Install Agda.  In the terminal, enter the following:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew <span class="nb">install </span>agda
+</code></pre></div>    </div>
+
+    <p>Now if you enter <code class="language-plaintext highlighter-rouge">agda --version</code>, you should see something like
+<code class="language-plaintext highlighter-rouge">Agda version 2.6.2.2</code> (or a more recent version, depending on which
+one you have installed).</p>
+  </li>
+  <li>
+    <p>Set up Agda.  In the terminal, enter the following:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>agda-mode setup
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="windows-10">Windows 10</h2>
+
+<p>The installation may fail if your Windows username contains a
+space. If this is the case, create a new user, make them an admin
+user, and then follow the below instructions as that user.</p>
+
+<h3 id="install-emacs">Install Emacs</h3>
+
+<p>Emacs is a text editor and Agda requires it. Download the <a href="http://mirror.team-cymru.com/gnu/emacs/windows/">installer
+for emacs 28.1 (or a more recent
+version)</a>.  Once
+the downloading is finished, you can install Emacs by double
+clicking the executable file and following the instructions.</p>
+
+<h3 id="install-haskell-and-agda">Install Haskell and Agda</h3>
+
+<ol>
+  <li>
+    <p>Open the Powershell.</p>
+  </li>
+  <li>
+    <p><a href="https://www.haskell.org/ghcup/">Install <strong>Haskell</strong></a>.</p>
+  </li>
+  <li>
+    <p>Close and reopen the Powershell.  You can type <code class="language-plaintext highlighter-rouge">ghc -v</code> and hit
+enter. You should see something like “Glasgow Haskell Compiler,
+version 8.10.3”.</p>
+  </li>
+  <li>
+    <p>Enter <code class="language-plaintext highlighter-rouge">cabal update</code>.</p>
+  </li>
+  <li>
+    <p>Enter <code class="language-plaintext highlighter-rouge">cabal install Agda</code> to install Agda.  This will take quite
+some time (possibly more than 30 minutes, depending on the
+configuration of the PC).</p>
+  </li>
+</ol>
+
+<h3 id="configure-emacs-and-agda-mode">Configure Emacs and Agda mode</h3>
+
+<ol>
+  <li>
+    <p>In the Powershell, enter the following command, replacing <code class="language-plaintext highlighter-rouge">name</code>
+with your own username.</p>
+
+    <div class="language-posh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$</span><span class="nn">env</span><span class="p">:</span><span class="nv">Path</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s2">";C:\Users\name\AppData\Roaming\cabal\bin"</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Now if you enter <code class="language-plaintext highlighter-rouge">agda --version</code> in the Powershell, you should see
+something like “Agda version 2.6.2.1”.</p>
+  </li>
+  <li>
+    <p>Enter the following command, replacing <code class="language-plaintext highlighter-rouge">name</code> with your own
+username.</p>
+
+    <div class="language-posh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">echo</span><span class="w"> </span><span class="s2">""</span><span class="w"> </span><span class="err">&gt;&gt;</span><span class="w"> </span><span class="nx">C:\Users\name\AppData\Roaming\.emacs</span><span class="w">
+</span></code></pre></div>    </div>
+
+    <p>The above will create an empty file with the name <code class="language-plaintext highlighter-rouge">.emacs</code> under
+the specified directory.</p>
+  </li>
+  <li>
+    <p>Open the above <code class="language-plaintext highlighter-rouge">.emacs</code> file using the installed Emacs editor.
+Paste the following code to the file, save it and close Emacs.
+(Use <code class="language-plaintext highlighter-rouge">Ctrl-X</code> followed by <code class="language-plaintext highlighter-rouge">Ctrl-S</code> to save, and <code class="language-plaintext highlighter-rouge">Ctrl-X</code> followed
+by <code class="language-plaintext highlighter-rouge">Ctrl-C</code> to close Emacs).</p>
+
+    <div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">setq</span> <span class="nv">exec-path</span> <span class="p">(</span><span class="nb">append</span> <span class="nv">exec-path</span> <span class="o">'</span><span class="p">(</span><span class="s">"C:\\cabal\\bin"</span><span class="p">)))</span>
+<span class="p">(</span><span class="nv">load-file</span> <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">coding-system-for-read</span> <span class="ss">'utf-8</span><span class="p">))</span>
+       <span class="p">(</span><span class="nv">shell-command-to-string</span> <span class="s">"C:\\cabal\\bin\\agda-mode locate"</span><span class="p">)))</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="sanity-check">Sanity Check</h2>
+
+<p>To check that the installation was successful, create an empty file
+called <code class="language-plaintext highlighter-rouge">nat.agda</code> and open it in Emacs. Paste the following Agda
+code to the file.</p>
+
+<pre class="Agda"><a id="6017" class="Keyword">data</a> <a id="Nat"></a><a id="6022" href="Chapter.Preamble.Setup.html#6022" class="Datatype">Nat</a> <a id="6026" class="Symbol">:</a> <a id="6028" href="Agda.Primitive.html#326" class="Primitive">Set</a> <a id="6032" class="Keyword">where</a>
+  <a id="Nat.Z"></a><a id="6040" href="Chapter.Preamble.Setup.html#6040" class="InductiveConstructor">Z</a> <a id="6042" class="Symbol">:</a> <a id="6044" href="Chapter.Preamble.Setup.html#6022" class="Datatype">Nat</a>
+  <a id="Nat.S"></a><a id="6050" href="Chapter.Preamble.Setup.html#6050" class="InductiveConstructor">S</a> <a id="6052" class="Symbol">:</a> <a id="6054" href="Chapter.Preamble.Setup.html#6022" class="Datatype">Nat</a> <a id="6058" class="Symbol">-&gt;</a> <a id="6061" href="Chapter.Preamble.Setup.html#6022" class="Datatype">Nat</a>
+</pre>
+<p>Notice that there is no color for the above Agda code after you
+pasted it.  Now type <code class="language-plaintext highlighter-rouge">Ctrl-C</code> followed by <code class="language-plaintext highlighter-rouge">Ctrl-L</code> in Emacs. This
+will color the above Agda code, confirming that Agda has
+successfully checked its validity.</p>
+
+<h2 id="homework">Homework</h2>
+
+<ol>
+  <li>Install and setup Agda.</li>
+</ol>
+
+  </div>
+  <ul class="menu">
+  <li>
+    <a href="Chapter.Preamble.Demo.html">‹ A taste of Agda</a></li>
+  <li><a href="Main.html">Table of contents ›</a></li>
+</ul>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+  <div class="wrapper">
+    <!-- <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"> -->
+    <!--   <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png"/> -->
+    <!-- </a> -->
+    2022-2023
+    <a href="https://boystrange.github.io">Luca Padovani</a>
+    and <a href="http://www.di.unito.it/~deligu/">Ugo de'Liguoro</a>.
+    Page generated on 20 Sep 2023.
+  </div>
+</footer>
+</body>
+
+</html>

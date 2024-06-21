@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Extrinsic verification of insertion sort | Introduction to Program Verification in Agda</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Extrinsic verification of insertion sort" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="Introduction to Program Verification in Agda" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Extrinsic verification of insertion sort" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Extrinsic verification of insertion sort","url":"/pages/Chapter.Fun.ExtrinsicInsertionSort.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/Agda.css">
+  <script src="../assets/js/mathjax.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="../assets/js/codereveal.js"></script>
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Introduction to Program Verification in Agda" /><!-- <script src="/assets/js/clipboard.min.js"></script> -->
+  <!-- <script src="/assets/js/codeselect.js"></script> -->
+</head>
+<body>
+
+<header class="site-header" role="banner">
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="../index.html">Introduction to Program Verification in Agda</a>
+    
+
+    <nav class="site-nav">
+      <a href="https://agda.readthedocs.io/en/latest/">AGDA DOCS</a>
+    </nav>
+  </div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+  <ul class="menu">
+  <li>
+    <a href="Chapter.Fun.SortedLists.html">‹ Specification of a sorting algorithm</a></li>
+  <li>
+    <a href="Chapter.Fun.IntrinsicInsertionSort.html">Intrinsic verification of insertion sort ›</a></li>
+</ul>
+  <header class="post-header">
+    <h1 class="post-title">Extrinsic verification of insertion sort</h1>
+  </header>
+
+  <div class="post-content">
+    <pre class="Agda"><a id="135" class="Keyword">module</a> <a id="142" href="Chapter.Fun.ExtrinsicInsertionSort.html" class="Module">Chapter.Fun.ExtrinsicInsertionSort</a> <a id="177" class="Keyword">where</a>
+</pre>
+<p>In this chapter we prove that <em>insertion sort</em>, one of the most
+basic sorting algorithms, is correct, namely that it satisfies the
+sorting specification defined in the <a href="/pages/Chapter.Fun.SortedLists.html">previous chapter</a>. We call <em>extrinsic
+verification</em> this form of proof since we will define the algorithm
+and the proof as separate entities. In contrast, in the <a href="/pages/Chapter.Fun.IntrinsicInsertionSort.html">next
+chapter</a> we
+will see an <em>intrinsic form</em> of verfication whereby the algorithm is
+correct “by construction”, in the sense that it incorporates the
+proof that it satisfies the specification.</p>
+
+<h2 id="imports">Imports</h2>
+
+<pre class="Agda"><a id="832" class="Keyword">open</a> <a id="837" class="Keyword">import</a> <a id="844" href="Library.Logic.html" class="Module">Library.Logic</a>
+<a id="858" class="Keyword">open</a> <a id="863" class="Keyword">import</a> <a id="870" href="Library.Nat.html" class="Module">Library.Nat</a>
+<a id="882" class="Keyword">open</a> <a id="887" class="Keyword">import</a> <a id="894" href="Library.List.html" class="Module">Library.List</a>
+<a id="907" class="Keyword">open</a> <a id="912" class="Keyword">import</a> <a id="919" href="Library.LessThan.html" class="Module">Library.LessThan</a>
+<a id="936" class="Keyword">open</a> <a id="941" class="Keyword">import</a> <a id="948" href="Chapter.Fun.SortedLists.html" class="Module">Chapter.Fun.SortedLists</a>
+</pre>
+<h2 id="insertion-sort">Insertion Sort</h2>
+
+<p>Insertion sort is based on a straightforward induction on the
+structure of the list to be sorted. Each element of the list is
+inserted in the right place in the sorted remainder of the list. For
+this reason, most of the work is performed by an auxiliary function
+<code class="language-plaintext highlighter-rouge">insert</code> that, given an element <code class="language-plaintext highlighter-rouge">x</code> and a (sorted) list <code class="language-plaintext highlighter-rouge">xs</code>,
+creates a new list in which <code class="language-plaintext highlighter-rouge">x</code> has been inserted in the right
+position of <code class="language-plaintext highlighter-rouge">xs</code> so that the result is still sorted.</p>
+
+<pre class="Agda"><a id="insert"></a><a id="1442" href="Chapter.Fun.ExtrinsicInsertionSort.html#1442" class="Function">insert</a> <a id="1449" class="Symbol">:</a> <a id="1451" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="1453" class="Symbol">-&gt;</a> <a id="1456" href="Library.List.html#84" class="Datatype">List</a> <a id="1461" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="1463" class="Symbol">-&gt;</a> <a id="1466" href="Library.List.html#84" class="Datatype">List</a> <a id="1471" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="1473" href="Chapter.Fun.ExtrinsicInsertionSort.html#1442" class="Function">insert</a> <a id="1480" href="Chapter.Fun.ExtrinsicInsertionSort.html#1480" class="Bound">x</a> <a id="1482" href="Library.List.html#113" class="InductiveConstructor">[]</a> <a id="1485" class="Symbol">=</a> <a id="1487" href="Library.List.html#159" class="Function Operator">[</a> <a id="1489" href="Chapter.Fun.ExtrinsicInsertionSort.html#1480" class="Bound">x</a> <a id="1491" href="Library.List.html#159" class="Function Operator">]</a>
+<a id="1493" href="Chapter.Fun.ExtrinsicInsertionSort.html#1442" class="Function">insert</a> <a id="1500" href="Chapter.Fun.ExtrinsicInsertionSort.html#1500" class="Bound">x</a> <a id="1502" class="Symbol">(</a><a id="1503" href="Chapter.Fun.ExtrinsicInsertionSort.html#1503" class="Bound">y</a> <a id="1505" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="1508" href="Chapter.Fun.ExtrinsicInsertionSort.html#1508" class="Bound">ys</a><a id="1510" class="Symbol">)</a> <a id="1512" class="Keyword">with</a> <a id="1517" href="Library.LessThan.html#770" class="Function">le-total</a> <a id="1526" href="Chapter.Fun.ExtrinsicInsertionSort.html#1500" class="Bound">x</a> <a id="1528" href="Chapter.Fun.ExtrinsicInsertionSort.html#1503" class="Bound">y</a>
+<a id="1530" class="Symbol">...</a> <a id="1534" class="Symbol">|</a> <a id="1536" href="Library.Logic.html#1446" class="InductiveConstructor">inl</a> <a id="1540" class="Symbol">_</a> <a id="1542" class="Symbol">=</a> <a id="1544" class="Bound">x</a> <a id="1546" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="1549" class="Bound">y</a> <a id="1551" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="1554" class="Bound">ys</a>
+<a id="1557" class="Symbol">...</a> <a id="1561" class="Symbol">|</a> <a id="1563" href="Library.Logic.html#1465" class="InductiveConstructor">inr</a> <a id="1567" class="Symbol">_</a> <a id="1569" class="Symbol">=</a> <a id="1571" class="Bound">y</a> <a id="1573" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="1576" href="Chapter.Fun.ExtrinsicInsertionSort.html#1442" class="Function">insert</a> <a id="1583" class="Bound">x</a> <a id="1585" class="Bound">ys</a>
+</pre>
+<p>Note the use of <code class="language-plaintext highlighter-rouge">le-total</code> to check the relation between <code class="language-plaintext highlighter-rouge">x</code> and
+<code class="language-plaintext highlighter-rouge">y</code>. If <code class="language-plaintext highlighter-rouge">x &lt;= y</code> then <code class="language-plaintext highlighter-rouge">x</code> will be positioned first since, from the
+hypothesis that the list <code class="language-plaintext highlighter-rouge">y :: ys</code> is sorted, we deduce that it is
+the smallest element overall. If <code class="language-plaintext highlighter-rouge">y &lt;= x</code> then <code class="language-plaintext highlighter-rouge">y</code> is the smallest
+element and <code class="language-plaintext highlighter-rouge">x</code> must be inserted somewhere within <code class="language-plaintext highlighter-rouge">ys</code>. We can now
+implement <code class="language-plaintext highlighter-rouge">insertion-sort</code> thus.</p>
+
+<pre class="Agda"><a id="insertion-sort"></a><a id="1964" href="Chapter.Fun.ExtrinsicInsertionSort.html#1964" class="Function">insertion-sort</a> <a id="1979" class="Symbol">:</a> <a id="1981" href="Library.List.html#84" class="Datatype">List</a> <a id="1986" href="Library.Nat.html#32" class="Datatype">ℕ</a> <a id="1988" class="Symbol">-&gt;</a> <a id="1991" href="Library.List.html#84" class="Datatype">List</a> <a id="1996" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="1998" href="Chapter.Fun.ExtrinsicInsertionSort.html#1964" class="Function">insertion-sort</a> <a id="2013" href="Library.List.html#113" class="InductiveConstructor">[]</a>        <a id="2023" class="Symbol">=</a> <a id="2025" href="Library.List.html#113" class="InductiveConstructor">[]</a>
+<a id="2028" href="Chapter.Fun.ExtrinsicInsertionSort.html#1964" class="Function">insertion-sort</a> <a id="2043" class="Symbol">(</a><a id="2044" href="Chapter.Fun.ExtrinsicInsertionSort.html#2044" class="Bound">x</a> <a id="2046" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="2049" href="Chapter.Fun.ExtrinsicInsertionSort.html#2049" class="Bound">xs</a><a id="2051" class="Symbol">)</a> <a id="2053" class="Symbol">=</a> <a id="2055" href="Chapter.Fun.ExtrinsicInsertionSort.html#1442" class="Function">insert</a> <a id="2062" href="Chapter.Fun.ExtrinsicInsertionSort.html#2044" class="Bound">x</a> <a id="2064" class="Symbol">(</a><a id="2065" href="Chapter.Fun.ExtrinsicInsertionSort.html#1964" class="Function">insertion-sort</a> <a id="2080" href="Chapter.Fun.ExtrinsicInsertionSort.html#2049" class="Bound">xs</a><a id="2082" class="Symbol">)</a>
+</pre>
+<p>To see that <code class="language-plaintext highlighter-rouge">insertion-sort</code> operates correctly, let us consider any
+random list of natural numbers, such as <code class="language-plaintext highlighter-rouge">ls</code> below.</p>
+
+<pre class="Agda"><a id="ls"></a><a id="2219" href="Chapter.Fun.ExtrinsicInsertionSort.html#2219" class="Function">ls</a> <a id="2222" class="Symbol">:</a> <a id="2224" href="Library.List.html#84" class="Datatype">List</a> <a id="2229" href="Library.Nat.html#32" class="Datatype">ℕ</a>
+<a id="2231" href="Chapter.Fun.ExtrinsicInsertionSort.html#2219" class="Function">ls</a> <a id="2234" class="Symbol">=</a> <a id="2236" class="Number">23</a> <a id="2239" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="2242" class="Number">45</a> <a id="2245" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="2248" class="Number">7</a> <a id="2250" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="2253" class="Number">867</a> <a id="2257" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="2260" class="Number">76</a> <a id="2263" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="2266" class="Number">43</a> <a id="2269" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="2272" class="Number">32</a> <a id="2275" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="2278" class="Number">21</a> <a id="2281" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="2284" class="Number">123</a> <a id="2288" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="2291" class="Number">344</a> <a id="2295" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="2298" class="Number">5</a> <a id="2300" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="2303" href="Library.List.html#113" class="InductiveConstructor">[]</a>
+</pre>
+<p>By entering <code class="language-plaintext highlighter-rouge">C-c C-n insert-sort ls</code> we obtain the following list,
+which is sorted.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>5 :: 7 :: 21 :: 23 :: 32 :: 43 :: 45 :: 76 :: 123 :: 344 :: 867 :: []
+</code></pre></div></div>
+
+<h2 id="insertion-sort-generates-a-sorted-list">Insertion sort generates a sorted list</h2>
+
+<p>We have seen that in the insertion sort algorithm most of the work
+is performed by the auxiliary function <code class="language-plaintext highlighter-rouge">insert</code>. Not surprisingly,
+this means that most of the verification efforts are made proving
+key properties of <code class="language-plaintext highlighter-rouge">insert</code> with respect to the various predicates
+that we have defined. We start from <code class="language-plaintext highlighter-rouge">LowerBound</code> and prove that if
+<code class="language-plaintext highlighter-rouge">x &lt;= y</code> and <code class="language-plaintext highlighter-rouge">x</code> is a lower bound for <code class="language-plaintext highlighter-rouge">ys</code>, then <code class="language-plaintext highlighter-rouge">x</code> is a lower
+bound also for the list obtained by inserting <code class="language-plaintext highlighter-rouge">y</code> in <code class="language-plaintext highlighter-rouge">ys</code>.</p>
+
+<pre class="Agda"><a id="lower-bound-insert"></a><a id="2975" href="Chapter.Fun.ExtrinsicInsertionSort.html#2975" class="Function">lower-bound-insert</a> <a id="2994" class="Symbol">:</a> <a id="2996" class="Symbol">∀{</a><a id="2998" href="Chapter.Fun.ExtrinsicInsertionSort.html#2998" class="Bound">x</a> <a id="3000" href="Chapter.Fun.ExtrinsicInsertionSort.html#3000" class="Bound">y</a> <a id="3002" class="Symbol">:</a> <a id="3004" href="Library.Nat.html#32" class="Datatype">ℕ</a><a id="3005" class="Symbol">}</a> <a id="3007" class="Symbol">{</a><a id="3008" href="Chapter.Fun.ExtrinsicInsertionSort.html#3008" class="Bound">ys</a> <a id="3011" class="Symbol">:</a> <a id="3013" href="Library.List.html#84" class="Datatype">List</a> <a id="3018" href="Library.Nat.html#32" class="Datatype">ℕ</a><a id="3019" class="Symbol">}</a> <a id="3021" class="Symbol">-&gt;</a> <a id="3024" href="Chapter.Fun.ExtrinsicInsertionSort.html#2998" class="Bound">x</a> <a id="3026" href="Library.LessThan.html#210" class="Datatype Operator">&lt;=</a> <a id="3029" href="Chapter.Fun.ExtrinsicInsertionSort.html#3000" class="Bound">y</a> <a id="3031" class="Symbol">-&gt;</a> <a id="3034" href="Chapter.Fun.SortedLists.html#3495" class="Datatype">LowerBound</a> <a id="3045" href="Chapter.Fun.ExtrinsicInsertionSort.html#2998" class="Bound">x</a> <a id="3047" href="Chapter.Fun.ExtrinsicInsertionSort.html#3008" class="Bound">ys</a> <a id="3050" class="Symbol">-&gt;</a>
+                     <a id="3074" href="Chapter.Fun.SortedLists.html#3495" class="Datatype">LowerBound</a> <a id="3085" href="Chapter.Fun.ExtrinsicInsertionSort.html#2998" class="Bound">x</a> <a id="3087" class="Symbol">(</a><a id="3088" href="Chapter.Fun.ExtrinsicInsertionSort.html#1442" class="Function">insert</a> <a id="3095" href="Chapter.Fun.ExtrinsicInsertionSort.html#3000" class="Bound">y</a> <a id="3097" href="Chapter.Fun.ExtrinsicInsertionSort.html#3008" class="Bound">ys</a><a id="3099" class="Symbol">)</a>
+<a id="3101" href="Chapter.Fun.ExtrinsicInsertionSort.html#2975" class="Function">lower-bound-insert</a> <a id="3120" href="Chapter.Fun.ExtrinsicInsertionSort.html#3120" class="Bound">x≤y</a> <a id="3124" href="Chapter.Fun.SortedLists.html#3538" class="InductiveConstructor">lb-[]</a> <a id="3130" class="Symbol">=</a> <a id="3132" href="Chapter.Fun.SortedLists.html#3564" class="InductiveConstructor">lb-::</a> <a id="3138" href="Chapter.Fun.ExtrinsicInsertionSort.html#3120" class="Bound">x≤y</a> <a id="3142" href="Chapter.Fun.SortedLists.html#3538" class="InductiveConstructor">lb-[]</a>
+<a id="3148" href="Chapter.Fun.ExtrinsicInsertionSort.html#2975" class="Function">lower-bound-insert</a> <a id="3167" class="Symbol">{</a><a id="3168" href="Chapter.Fun.ExtrinsicInsertionSort.html#3168" class="Bound">x</a><a id="3169" class="Symbol">}</a> <a id="3171" class="Symbol">{</a><a id="3172" href="Chapter.Fun.ExtrinsicInsertionSort.html#3172" class="Bound">y</a><a id="3173" class="Symbol">}</a> <a id="3175" class="Symbol">{</a><a id="3176" href="Chapter.Fun.ExtrinsicInsertionSort.html#3176" class="Bound">z</a> <a id="3178" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="3181" href="Chapter.Fun.ExtrinsicInsertionSort.html#3181" class="Bound">ys</a><a id="3183" class="Symbol">}</a> <a id="3185" href="Chapter.Fun.ExtrinsicInsertionSort.html#3185" class="Bound">x≤y</a> <a id="3189" class="Symbol">(</a><a id="3190" href="Chapter.Fun.SortedLists.html#3564" class="InductiveConstructor">lb-::</a> <a id="3196" href="Chapter.Fun.ExtrinsicInsertionSort.html#3196" class="Bound">x≤z</a> <a id="3200" href="Chapter.Fun.ExtrinsicInsertionSort.html#3200" class="Bound">x≤ys</a><a id="3204" class="Symbol">)</a> <a id="3206" class="Keyword">with</a> <a id="3211" href="Library.LessThan.html#770" class="Function">le-total</a> <a id="3220" href="Chapter.Fun.ExtrinsicInsertionSort.html#3172" class="Bound">y</a> <a id="3222" href="Chapter.Fun.ExtrinsicInsertionSort.html#3176" class="Bound">z</a>
+<a id="3224" class="Symbol">...</a> <a id="3228" class="Symbol">|</a> <a id="3230" href="Library.Logic.html#1446" class="InductiveConstructor">inl</a> <a id="3234" href="Chapter.Fun.ExtrinsicInsertionSort.html#3234" class="Bound">y≤z</a> <a id="3238" class="Symbol">=</a> <a id="3240" href="Chapter.Fun.SortedLists.html#3564" class="InductiveConstructor">lb-::</a> <a id="3246" class="Bound">x≤y</a> <a id="3250" class="Symbol">(</a><a id="3251" href="Chapter.Fun.SortedLists.html#3564" class="InductiveConstructor">lb-::</a> <a id="3257" class="Bound">x≤z</a> <a id="3261" class="Bound">x≤ys</a><a id="3265" class="Symbol">)</a>
+<a id="3267" class="Symbol">...</a> <a id="3271" class="Symbol">|</a> <a id="3273" href="Library.Logic.html#1465" class="InductiveConstructor">inr</a> <a id="3277" href="Chapter.Fun.ExtrinsicInsertionSort.html#3277" class="Bound">z≤y</a> <a id="3281" class="Symbol">=</a> <a id="3283" href="Chapter.Fun.SortedLists.html#3564" class="InductiveConstructor">lb-::</a> <a id="3289" class="Bound">x≤z</a> <a id="3293" class="Symbol">(</a><a id="3294" href="Chapter.Fun.ExtrinsicInsertionSort.html#2975" class="Function">lower-bound-insert</a> <a id="3313" class="Bound">x≤y</a> <a id="3317" class="Bound">x≤ys</a><a id="3321" class="Symbol">)</a>
+</pre>
+<p>Note that we have to perform a case analysis on <code class="language-plaintext highlighter-rouge">le-total y z</code> when
+we deal with the case of non-empty lists to match the definition of
+<code class="language-plaintext highlighter-rouge">insert</code>. To do that, we give names to the implicit arguments of the
+function. We could have omitted <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">ys</code>, but in this way it is
+clearer to see what the proofs <code class="language-plaintext highlighter-rouge">x≤y</code> and <code class="language-plaintext highlighter-rouge">x≤ys</code> refer to.</p>
+
+<p>Using this result (as well as <code class="language-plaintext highlighter-rouge">lower-lower-bound</code> which was proposed
+as an exercise in the <a href="/pages/Chapter.Fun.SortedLists.html">previous chapter</a>), we prove that <code class="language-plaintext highlighter-rouge">insert x ys</code>
+is a sorted list if so is <code class="language-plaintext highlighter-rouge">ys</code>.</p>
+
+<pre class="Agda"><a id="sorted-insert"></a><a id="3882" href="Chapter.Fun.ExtrinsicInsertionSort.html#3882" class="Function">sorted-insert</a> <a id="3896" class="Symbol">:</a> <a id="3898" class="Symbol">∀(</a><a id="3900" href="Chapter.Fun.ExtrinsicInsertionSort.html#3900" class="Bound">x</a> <a id="3902" class="Symbol">:</a> <a id="3904" href="Library.Nat.html#32" class="Datatype">ℕ</a><a id="3905" class="Symbol">)</a> <a id="3907" class="Symbol">(</a><a id="3908" href="Chapter.Fun.ExtrinsicInsertionSort.html#3908" class="Bound">ys</a> <a id="3911" class="Symbol">:</a> <a id="3913" href="Library.List.html#84" class="Datatype">List</a> <a id="3918" href="Library.Nat.html#32" class="Datatype">ℕ</a><a id="3919" class="Symbol">)</a> <a id="3921" class="Symbol">-&gt;</a> <a id="3924" href="Chapter.Fun.SortedLists.html#4486" class="Datatype">Sorted</a> <a id="3931" href="Chapter.Fun.ExtrinsicInsertionSort.html#3908" class="Bound">ys</a> <a id="3934" class="Symbol">-&gt;</a> <a id="3937" href="Chapter.Fun.SortedLists.html#4486" class="Datatype">Sorted</a> <a id="3944" class="Symbol">(</a><a id="3945" href="Chapter.Fun.ExtrinsicInsertionSort.html#1442" class="Function">insert</a> <a id="3952" href="Chapter.Fun.ExtrinsicInsertionSort.html#3900" class="Bound">x</a> <a id="3954" href="Chapter.Fun.ExtrinsicInsertionSort.html#3908" class="Bound">ys</a><a id="3956" class="Symbol">)</a>
+<a id="3958" href="Chapter.Fun.ExtrinsicInsertionSort.html#3882" class="Function">sorted-insert</a> <a id="3972" href="Chapter.Fun.ExtrinsicInsertionSort.html#3972" class="Bound">x</a> <a id="3974" href="Library.List.html#113" class="InductiveConstructor">[]</a> <a id="3977" href="Chapter.Fun.SortedLists.html#4517" class="InductiveConstructor">sorted-[]</a> <a id="3987" class="Symbol">=</a> <a id="3989" href="Chapter.Fun.SortedLists.html#4541" class="InductiveConstructor">sorted-::</a> <a id="3999" href="Chapter.Fun.SortedLists.html#3538" class="InductiveConstructor">lb-[]</a> <a id="4005" href="Chapter.Fun.SortedLists.html#4517" class="InductiveConstructor">sorted-[]</a>
+<a id="4015" href="Chapter.Fun.ExtrinsicInsertionSort.html#3882" class="Function">sorted-insert</a> <a id="4029" href="Chapter.Fun.ExtrinsicInsertionSort.html#4029" class="Bound">x</a> <a id="4031" class="Symbol">(</a><a id="4032" href="Chapter.Fun.ExtrinsicInsertionSort.html#4032" class="Bound">y</a> <a id="4034" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="4037" href="Chapter.Fun.ExtrinsicInsertionSort.html#4037" class="Bound">ys</a><a id="4039" class="Symbol">)</a> <a id="4041" class="Symbol">(</a><a id="4042" href="Chapter.Fun.SortedLists.html#4541" class="InductiveConstructor">sorted-::</a> <a id="4052" href="Chapter.Fun.ExtrinsicInsertionSort.html#4052" class="Bound">y≤ys</a> <a id="4057" href="Chapter.Fun.ExtrinsicInsertionSort.html#4057" class="Bound">ys-sorted</a><a id="4066" class="Symbol">)</a> <a id="4068" class="Keyword">with</a> <a id="4073" href="Library.LessThan.html#770" class="Function">le-total</a> <a id="4082" href="Chapter.Fun.ExtrinsicInsertionSort.html#4029" class="Bound">x</a> <a id="4084" href="Chapter.Fun.ExtrinsicInsertionSort.html#4032" class="Bound">y</a>
+<a id="4086" class="Symbol">...</a> <a id="4090" class="Symbol">|</a> <a id="4092" href="Library.Logic.html#1446" class="InductiveConstructor">inl</a> <a id="4096" href="Chapter.Fun.ExtrinsicInsertionSort.html#4096" class="Bound">x≤y</a> <a id="4100" class="Symbol">=</a> <a id="4102" href="Chapter.Fun.SortedLists.html#4541" class="InductiveConstructor">sorted-::</a> <a id="4112" class="Symbol">(</a><a id="4113" href="Chapter.Fun.SortedLists.html#3564" class="InductiveConstructor">lb-::</a> <a id="4119" href="Chapter.Fun.ExtrinsicInsertionSort.html#4096" class="Bound">x≤y</a> <a id="4123" class="Symbol">(</a><a id="4124" href="Chapter.Fun.SortedLists.html#3789" class="Function">lower-lower-bound</a> <a id="4142" href="Chapter.Fun.ExtrinsicInsertionSort.html#4096" class="Bound">x≤y</a> <a id="4146" class="Bound">y≤ys</a><a id="4150" class="Symbol">))</a>
+                          <a id="4179" class="Symbol">(</a><a id="4180" href="Chapter.Fun.SortedLists.html#4541" class="InductiveConstructor">sorted-::</a> <a id="4190" class="Bound">y≤ys</a> <a id="4195" class="Bound">ys-sorted</a><a id="4204" class="Symbol">)</a>
+<a id="4206" class="Symbol">...</a> <a id="4210" class="Symbol">|</a> <a id="4212" href="Library.Logic.html#1465" class="InductiveConstructor">inr</a> <a id="4216" href="Chapter.Fun.ExtrinsicInsertionSort.html#4216" class="Bound">y≤x</a> <a id="4220" class="Symbol">=</a> <a id="4222" href="Chapter.Fun.SortedLists.html#4541" class="InductiveConstructor">sorted-::</a> <a id="4232" class="Symbol">(</a><a id="4233" href="Chapter.Fun.ExtrinsicInsertionSort.html#2975" class="Function">lower-bound-insert</a> <a id="4252" href="Chapter.Fun.ExtrinsicInsertionSort.html#4216" class="Bound">y≤x</a> <a id="4256" class="Bound">y≤ys</a><a id="4260" class="Symbol">)</a>
+                          <a id="4288" class="Symbol">(</a><a id="4289" href="Chapter.Fun.ExtrinsicInsertionSort.html#3882" class="Function">sorted-insert</a> <a id="4303" class="Bound">x</a> <a id="4305" class="Bound">ys</a> <a id="4308" class="Bound">ys-sorted</a><a id="4317" class="Symbol">)</a>
+</pre>
+<p>The proof that <code class="language-plaintext highlighter-rouge">insertion-sort xs</code> is sorted is now obtained by
+induction on <code class="language-plaintext highlighter-rouge">xs</code>, using the previous lemmas.</p>
+
+<pre class="Agda"><a id="sorted-insertion-sort"></a><a id="4439" href="Chapter.Fun.ExtrinsicInsertionSort.html#4439" class="Function">sorted-insertion-sort</a> <a id="4461" class="Symbol">:</a> <a id="4463" class="Symbol">∀(</a><a id="4465" href="Chapter.Fun.ExtrinsicInsertionSort.html#4465" class="Bound">xs</a> <a id="4468" class="Symbol">:</a> <a id="4470" href="Library.List.html#84" class="Datatype">List</a> <a id="4475" href="Library.Nat.html#32" class="Datatype">ℕ</a><a id="4476" class="Symbol">)</a> <a id="4478" class="Symbol">-&gt;</a> <a id="4481" href="Chapter.Fun.SortedLists.html#4486" class="Datatype">Sorted</a> <a id="4488" class="Symbol">(</a><a id="4489" href="Chapter.Fun.ExtrinsicInsertionSort.html#1964" class="Function">insertion-sort</a> <a id="4504" href="Chapter.Fun.ExtrinsicInsertionSort.html#4465" class="Bound">xs</a><a id="4506" class="Symbol">)</a>
+<a id="4508" href="Chapter.Fun.ExtrinsicInsertionSort.html#4439" class="Function">sorted-insertion-sort</a> <a id="4530" href="Library.List.html#113" class="InductiveConstructor">[]</a> <a id="4533" class="Symbol">=</a> <a id="4535" href="Chapter.Fun.SortedLists.html#4517" class="InductiveConstructor">sorted-[]</a>
+<a id="4545" href="Chapter.Fun.ExtrinsicInsertionSort.html#4439" class="Function">sorted-insertion-sort</a> <a id="4567" class="Symbol">(</a><a id="4568" href="Chapter.Fun.ExtrinsicInsertionSort.html#4568" class="Bound">x</a> <a id="4570" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="4573" href="Chapter.Fun.ExtrinsicInsertionSort.html#4573" class="Bound">xs</a><a id="4575" class="Symbol">)</a> <a id="4577" class="Symbol">=</a>
+  <a id="4581" href="Chapter.Fun.ExtrinsicInsertionSort.html#3882" class="Function">sorted-insert</a> <a id="4595" href="Chapter.Fun.ExtrinsicInsertionSort.html#4568" class="Bound">x</a> <a id="4597" class="Symbol">(</a><a id="4598" href="Chapter.Fun.ExtrinsicInsertionSort.html#1964" class="Function">insertion-sort</a> <a id="4613" href="Chapter.Fun.ExtrinsicInsertionSort.html#4573" class="Bound">xs</a><a id="4615" class="Symbol">)</a> <a id="4617" class="Symbol">(</a><a id="4618" href="Chapter.Fun.ExtrinsicInsertionSort.html#4439" class="Function">sorted-insertion-sort</a> <a id="4640" href="Chapter.Fun.ExtrinsicInsertionSort.html#4573" class="Bound">xs</a><a id="4642" class="Symbol">)</a>
+</pre>
+<h2 id="insertion-sort-generates-a-permutation">Insertion sort generates a permutation</h2>
+
+<p>We now proceed by showing that the list <code class="language-plaintext highlighter-rouge">insertion-sort xs</code> is a
+permutation of <code class="language-plaintext highlighter-rouge">xs</code>. As usual, we have to formulate a related
+property also for the auxiliary function <code class="language-plaintext highlighter-rouge">insert</code>. In particular, we
+need to show that the list <code class="language-plaintext highlighter-rouge">insert x ys</code> is a permutation of <code class="language-plaintext highlighter-rouge">x ::
+ys</code>.</p>
+
+<pre class="Agda"><a id="insert-permutation"></a><a id="4965" href="Chapter.Fun.ExtrinsicInsertionSort.html#4965" class="Function">insert-permutation</a> <a id="4984" class="Symbol">:</a> <a id="4986" class="Symbol">∀(</a><a id="4988" href="Chapter.Fun.ExtrinsicInsertionSort.html#4988" class="Bound">x</a> <a id="4990" class="Symbol">:</a> <a id="4992" href="Library.Nat.html#32" class="Datatype">ℕ</a><a id="4993" class="Symbol">)</a> <a id="4995" class="Symbol">(</a><a id="4996" href="Chapter.Fun.ExtrinsicInsertionSort.html#4996" class="Bound">ys</a> <a id="4999" class="Symbol">:</a> <a id="5001" href="Library.List.html#84" class="Datatype">List</a> <a id="5006" href="Library.Nat.html#32" class="Datatype">ℕ</a><a id="5007" class="Symbol">)</a> <a id="5009" class="Symbol">-&gt;</a> <a id="5012" href="Chapter.Fun.ExtrinsicInsertionSort.html#1442" class="Function">insert</a> <a id="5019" href="Chapter.Fun.ExtrinsicInsertionSort.html#4988" class="Bound">x</a> <a id="5021" href="Chapter.Fun.ExtrinsicInsertionSort.html#4996" class="Bound">ys</a> <a id="5024" href="Chapter.Fun.SortedLists.html#6290" class="Datatype Operator">#</a> <a id="5026" class="Symbol">(</a><a id="5027" href="Chapter.Fun.ExtrinsicInsertionSort.html#4988" class="Bound">x</a> <a id="5029" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="5032" href="Chapter.Fun.ExtrinsicInsertionSort.html#4996" class="Bound">ys</a><a id="5034" class="Symbol">)</a>
+<a id="5036" href="Chapter.Fun.ExtrinsicInsertionSort.html#4965" class="Function">insert-permutation</a> <a id="5055" href="Chapter.Fun.ExtrinsicInsertionSort.html#5055" class="Bound">x</a> <a id="5057" href="Library.List.html#113" class="InductiveConstructor">[]</a> <a id="5060" class="Symbol">=</a> <a id="5062" href="Chapter.Fun.SortedLists.html#6338" class="InductiveConstructor">#refl</a>
+<a id="5068" href="Chapter.Fun.ExtrinsicInsertionSort.html#4965" class="Function">insert-permutation</a> <a id="5087" href="Chapter.Fun.ExtrinsicInsertionSort.html#5087" class="Bound">x</a> <a id="5089" class="Symbol">(</a><a id="5090" href="Chapter.Fun.ExtrinsicInsertionSort.html#5090" class="Bound">y</a> <a id="5092" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="5095" href="Chapter.Fun.ExtrinsicInsertionSort.html#5095" class="Bound">ys</a><a id="5097" class="Symbol">)</a> <a id="5099" class="Keyword">with</a> <a id="5104" href="Library.LessThan.html#770" class="Function">le-total</a> <a id="5113" href="Chapter.Fun.ExtrinsicInsertionSort.html#5087" class="Bound">x</a> <a id="5115" href="Chapter.Fun.ExtrinsicInsertionSort.html#5090" class="Bound">y</a>
+<a id="5117" class="Symbol">...</a> <a id="5121" class="Symbol">|</a> <a id="5123" href="Library.Logic.html#1446" class="InductiveConstructor">inl</a> <a id="5127" href="Chapter.Fun.ExtrinsicInsertionSort.html#5127" class="Bound">x≤y</a> <a id="5131" class="Symbol">=</a> <a id="5133" href="Chapter.Fun.SortedLists.html#6338" class="InductiveConstructor">#refl</a>
+<a id="5139" class="Symbol">...</a> <a id="5143" class="Symbol">|</a> <a id="5145" href="Library.Logic.html#1465" class="InductiveConstructor">inr</a> <a id="5149" href="Chapter.Fun.ExtrinsicInsertionSort.html#5149" class="Bound">y≤x</a> <a id="5153" class="Symbol">=</a>
+  <a id="5157" href="Chapter.Fun.SortedLists.html#7256" class="Function Operator">#begin</a>
+    <a id="5168" class="Bound">y</a> <a id="5170" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="5173" href="Chapter.Fun.ExtrinsicInsertionSort.html#1442" class="Function">insert</a> <a id="5180" class="Bound">x</a> <a id="5182" class="Bound">ys</a> <a id="5185" href="Chapter.Fun.SortedLists.html#7393" class="Function Operator">#⟨</a> <a id="5188" href="Chapter.Fun.SortedLists.html#6440" class="InductiveConstructor">#cong</a> <a id="5194" class="Symbol">(</a><a id="5195" href="Chapter.Fun.ExtrinsicInsertionSort.html#4965" class="Function">insert-permutation</a> <a id="5214" class="Bound">x</a> <a id="5216" class="Bound">ys</a><a id="5218" class="Symbol">)</a> <a id="5220" href="Chapter.Fun.SortedLists.html#7393" class="Function Operator">⟩</a>
+    <a id="5226" class="Bound">y</a> <a id="5228" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="5231" class="Bound">x</a> <a id="5233" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="5236" class="Bound">ys</a>     <a id="5243" href="Chapter.Fun.SortedLists.html#7393" class="Function Operator">#⟨</a> <a id="5246" href="Chapter.Fun.SortedLists.html#6374" class="InductiveConstructor">#swap</a> <a id="5252" href="Chapter.Fun.SortedLists.html#7393" class="Function Operator">⟩</a>
+    <a id="5258" class="Bound">x</a> <a id="5260" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="5263" class="Bound">y</a> <a id="5265" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="5268" class="Bound">ys</a>
+  <a id="5273" href="Chapter.Fun.SortedLists.html#7332" class="Function Operator">#end</a>
+</pre>
+<p>In the two sub-cases that depend on the relationship between <code class="language-plaintext highlighter-rouge">x</code> and
+<code class="language-plaintext highlighter-rouge">y</code> we have to consider the shape of the resulting list, which is <code class="language-plaintext highlighter-rouge">x
+:: y :: ys</code> when <code class="language-plaintext highlighter-rouge">x &lt;= y</code> and <code class="language-plaintext highlighter-rouge">y :: insert x ys</code> otherwise (see the
+definition of <code class="language-plaintext highlighter-rouge">insert</code>). In the first sub-case no permutation is
+necessary, so we just use reflexivity. In the second case we use the
+induction hypothesis and then a single swap to move <code class="language-plaintext highlighter-rouge">x</code> to the front
+of the list.</p>
+
+<p>The proof that <code class="language-plaintext highlighter-rouge">insertion-sort xs</code> generates a permutation of <code class="language-plaintext highlighter-rouge">xs</code>
+is now a simple matter.</p>
+
+<pre class="Agda"><a id="insertion-sort-permutation"></a><a id="5802" href="Chapter.Fun.ExtrinsicInsertionSort.html#5802" class="Function">insertion-sort-permutation</a> <a id="5829" class="Symbol">:</a> <a id="5831" class="Symbol">∀(</a><a id="5833" href="Chapter.Fun.ExtrinsicInsertionSort.html#5833" class="Bound">xs</a> <a id="5836" class="Symbol">:</a> <a id="5838" href="Library.List.html#84" class="Datatype">List</a> <a id="5843" href="Library.Nat.html#32" class="Datatype">ℕ</a><a id="5844" class="Symbol">)</a> <a id="5846" class="Symbol">-&gt;</a> <a id="5849" href="Chapter.Fun.ExtrinsicInsertionSort.html#1964" class="Function">insertion-sort</a> <a id="5864" href="Chapter.Fun.ExtrinsicInsertionSort.html#5833" class="Bound">xs</a> <a id="5867" href="Chapter.Fun.SortedLists.html#6290" class="Datatype Operator">#</a> <a id="5869" href="Chapter.Fun.ExtrinsicInsertionSort.html#5833" class="Bound">xs</a>
+<a id="5872" href="Chapter.Fun.ExtrinsicInsertionSort.html#5802" class="Function">insertion-sort-permutation</a> <a id="5899" href="Library.List.html#113" class="InductiveConstructor">[]</a> <a id="5902" class="Symbol">=</a> <a id="5904" href="Chapter.Fun.SortedLists.html#6338" class="InductiveConstructor">#refl</a>
+<a id="5910" href="Chapter.Fun.ExtrinsicInsertionSort.html#5802" class="Function">insertion-sort-permutation</a> <a id="5937" class="Symbol">(</a><a id="5938" href="Chapter.Fun.ExtrinsicInsertionSort.html#5938" class="Bound">x</a> <a id="5940" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="5943" href="Chapter.Fun.ExtrinsicInsertionSort.html#5943" class="Bound">xs</a><a id="5945" class="Symbol">)</a> <a id="5947" class="Symbol">=</a>
+  <a id="5951" href="Chapter.Fun.SortedLists.html#7256" class="Function Operator">#begin</a>
+    <a id="5962" href="Chapter.Fun.ExtrinsicInsertionSort.html#1964" class="Function">insertion-sort</a> <a id="5977" class="Symbol">(</a><a id="5978" href="Chapter.Fun.ExtrinsicInsertionSort.html#5938" class="Bound">x</a> <a id="5980" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="5983" href="Chapter.Fun.ExtrinsicInsertionSort.html#5943" class="Bound">xs</a><a id="5985" class="Symbol">)</a>     <a id="5991" href="Chapter.Fun.SortedLists.html#7393" class="Function Operator">#⟨</a> <a id="5994" href="Chapter.Fun.SortedLists.html#6338" class="InductiveConstructor">#refl</a> <a id="6000" href="Chapter.Fun.SortedLists.html#7393" class="Function Operator">⟩</a>
+    <a id="6006" href="Chapter.Fun.ExtrinsicInsertionSort.html#1442" class="Function">insert</a> <a id="6013" href="Chapter.Fun.ExtrinsicInsertionSort.html#5938" class="Bound">x</a> <a id="6015" class="Symbol">(</a><a id="6016" href="Chapter.Fun.ExtrinsicInsertionSort.html#1964" class="Function">insertion-sort</a> <a id="6031" href="Chapter.Fun.ExtrinsicInsertionSort.html#5943" class="Bound">xs</a><a id="6033" class="Symbol">)</a> <a id="6035" href="Chapter.Fun.SortedLists.html#7393" class="Function Operator">#⟨</a> <a id="6038" href="Chapter.Fun.ExtrinsicInsertionSort.html#4965" class="Function">insert-permutation</a> <a id="6057" href="Chapter.Fun.ExtrinsicInsertionSort.html#5938" class="Bound">x</a> <a id="6059" class="Symbol">(</a><a id="6060" href="Chapter.Fun.ExtrinsicInsertionSort.html#1964" class="Function">insertion-sort</a> <a id="6075" href="Chapter.Fun.ExtrinsicInsertionSort.html#5943" class="Bound">xs</a><a id="6077" class="Symbol">)</a> <a id="6079" href="Chapter.Fun.SortedLists.html#7393" class="Function Operator">⟩</a>
+    <a id="6085" href="Chapter.Fun.ExtrinsicInsertionSort.html#5938" class="Bound">x</a> <a id="6087" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="6090" href="Chapter.Fun.ExtrinsicInsertionSort.html#1964" class="Function">insertion-sort</a> <a id="6105" href="Chapter.Fun.ExtrinsicInsertionSort.html#5943" class="Bound">xs</a>       <a id="6114" href="Chapter.Fun.SortedLists.html#7393" class="Function Operator">#⟨</a> <a id="6117" href="Chapter.Fun.SortedLists.html#6440" class="InductiveConstructor">#cong</a> <a id="6123" class="Symbol">(</a><a id="6124" href="Chapter.Fun.ExtrinsicInsertionSort.html#5802" class="Function">insertion-sort-permutation</a> <a id="6151" href="Chapter.Fun.ExtrinsicInsertionSort.html#5943" class="Bound">xs</a><a id="6153" class="Symbol">)</a> <a id="6155" href="Chapter.Fun.SortedLists.html#7393" class="Function Operator">⟩</a>
+    <a id="6161" href="Chapter.Fun.ExtrinsicInsertionSort.html#5938" class="Bound">x</a> <a id="6163" href="Library.List.html#129" class="InductiveConstructor Operator">::</a> <a id="6166" href="Chapter.Fun.ExtrinsicInsertionSort.html#5943" class="Bound">xs</a>
+  <a id="6171" href="Chapter.Fun.SortedLists.html#7332" class="Function Operator">#end</a>
+</pre>
+<p>The application of reflexivity in the inductive case uses the fact
+that <code class="language-plaintext highlighter-rouge">insertion-sort (x :: xs)</code> is definitionally equal to <code class="language-plaintext highlighter-rouge">insert x
+(insertion-sort xs)</code>. This step is not strictly necessary, but it
+helps to clarify the proof as it shows every non-trivial rewriting
+that takes place.</p>
+
+<h2 id="putting-it-all-together">Putting it all together</h2>
+
+<p>We can now provide a verified version of insertion sort that
+satisfies the <code class="language-plaintext highlighter-rouge">SortingFunction</code> specification.</p>
+
+<pre class="Agda"><a id="verified-insertion-sort"></a><a id="6610" href="Chapter.Fun.ExtrinsicInsertionSort.html#6610" class="Function">verified-insertion-sort</a> <a id="6634" class="Symbol">:</a> <a id="6636" href="Chapter.Fun.SortedLists.html#8800" class="Function">SortingFunction</a>
+<a id="6652" href="Chapter.Fun.ExtrinsicInsertionSort.html#6610" class="Function">verified-insertion-sort</a> <a id="6676" href="Chapter.Fun.ExtrinsicInsertionSort.html#6676" class="Bound">xs</a> <a id="6679" class="Symbol">=</a>
+  <a id="6683" href="Chapter.Fun.ExtrinsicInsertionSort.html#1964" class="Function">insertion-sort</a> <a id="6698" href="Chapter.Fun.ExtrinsicInsertionSort.html#6676" class="Bound">xs</a> <a id="6701" href="Library.Logic.html#271" class="InductiveConstructor Operator">,</a> <a id="6703" href="Chapter.Fun.ExtrinsicInsertionSort.html#5802" class="Function">insertion-sort-permutation</a> <a id="6730" href="Chapter.Fun.ExtrinsicInsertionSort.html#6676" class="Bound">xs</a> <a id="6733" href="Library.Logic.html#271" class="InductiveConstructor Operator">,</a> <a id="6735" href="Chapter.Fun.ExtrinsicInsertionSort.html#4439" class="Function">sorted-insertion-sort</a> <a id="6757" href="Chapter.Fun.ExtrinsicInsertionSort.html#6676" class="Bound">xs</a>
+</pre>
+
+  </div>
+  <ul class="menu">
+  <li>
+    <a href="Chapter.Fun.SortedLists.html">‹ Specification of a sorting algorithm</a></li>
+  <li>
+    <a href="Chapter.Fun.IntrinsicInsertionSort.html">Intrinsic verification of insertion sort ›</a></li>
+</ul>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+  <div class="wrapper">
+    <!-- <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"> -->
+    <!--   <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png"/> -->
+    <!-- </a> -->
+    2022-2023
+    <a href="https://boystrange.github.io">Luca Padovani</a>
+    and <a href="http://www.di.unito.it/~deligu/">Ugo de'Liguoro</a>.
+    Page generated on 20 Sep 2023.
+  </div>
+</footer>
+</body>
+
+</html>

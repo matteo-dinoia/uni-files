@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Proving properties of Booleans | Introduction to Program Verification in Agda</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Proving properties of Booleans" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="Introduction to Program Verification in Agda" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Proving properties of Booleans" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Proving properties of Booleans","url":"/pages/Chapter.Intro.Bool.Properties.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/Agda.css">
+  <script src="../assets/js/mathjax.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="../assets/js/codereveal.js"></script>
+  <link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Introduction to Program Verification in Agda" /><!-- <script src="/assets/js/clipboard.min.js"></script> -->
+  <!-- <script src="/assets/js/codeselect.js"></script> -->
+</head>
+<body>
+
+<header class="site-header" role="banner">
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="../index.html">Introduction to Program Verification in Agda</a>
+    
+
+    <nav class="site-nav">
+      <a href="https://agda.readthedocs.io/en/latest/">AGDA DOCS</a>
+    </nav>
+  </div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+  <ul class="menu">
+  <li>
+    <a href="Chapter.Intro.Bool.html">‹ Inductive data types: the Booleans</a></li>
+  <li>
+    <a href="Chapter.Intro.NaturalNumbers.html">Natural numbers ›</a></li>
+</ul>
+  <header class="post-header">
+    <h1 class="post-title">Proving properties of Booleans</h1>
+  </header>
+
+  <div class="post-content">
+    <!--
+<pre class="Agda"><a id="119" class="Symbol">{-#</a> <a id="123" class="Keyword">OPTIONS</a> <a id="131" class="Pragma">--allow-unsolved-metas</a> <a id="154" class="Symbol">#-}</a>
+</pre>-->
+
+<pre class="Agda"><a id="171" class="Keyword">module</a> <a id="178" href="Chapter.Intro.Bool.Properties.html" class="Module">Chapter.Intro.Bool.Properties</a> <a id="208" class="Keyword">where</a>
+</pre>
+<p>In this section we start exploring the use of Agda not only as a
+language for writing programs, but also as a language for writing
+<strong>proofs</strong> about programs.</p>
+
+<h2 id="imports">Imports</h2>
+
+<p>We must be able to express <strong>propositions</strong>, namely assertions that
+can be either “true” (if we are able to come up with a proof for
+them) or “false” (if we are able to show that every proof of them
+leads to a contradiction). In this chapter we will use
+<strong>propositional equality</strong>. This relation is not built into Agda,
+but is actually <a href="Chapter.Logic.Equality.html">definable as a data
+type</a>. For the time being, we simply
+<em>use</em> the definition of propositional equality from the library
+without looking at its definition. To this aim, we <em>import</em> the
+<code class="language-plaintext highlighter-rouge">Equality</code> module, along with the previous section from which we
+inherit the definition of <code class="language-plaintext highlighter-rouge">Bool</code> and the functions on boolean
+values.</p>
+
+<pre class="Agda"><a id="1081" class="Keyword">open</a> <a id="1086" class="Keyword">import</a> <a id="1093" href="Library.Equality.html" class="Module">Library.Equality</a>
+<a id="1110" class="Keyword">open</a> <a id="1115" class="Keyword">import</a> <a id="1122" href="Chapter.Intro.Bool.html" class="Module">Chapter.Intro.Bool</a>
+</pre>
+<h2 id="propositional-equality">Propositional equality</h2>
+
+<p>The first aspect we have to familiarize with is that, unlike the
+equality operator that is commonly found in ordinary programming
+languages, Agda’s propositional equality <code class="language-plaintext highlighter-rouge">==</code> allows us to build
+<em>types</em>. More precisely, we can write types such as <code class="language-plaintext highlighter-rouge">true == true</code>
+and <code class="language-plaintext highlighter-rouge">true == false</code> or, equivalently, <code class="language-plaintext highlighter-rouge">_==_ true true</code> and <code class="language-plaintext highlighter-rouge">_==_
+true false</code>. An expression of type <code class="language-plaintext highlighter-rouge">true == true</code> is meant to
+represent a <em>proof</em> that <code class="language-plaintext highlighter-rouge">true</code> is equal to <code class="language-plaintext highlighter-rouge">true</code>, just like an
+expression of type <code class="language-plaintext highlighter-rouge">false == false</code> is meant to represent a <em>proof</em>
+that <code class="language-plaintext highlighter-rouge">false</code> is equal to <code class="language-plaintext highlighter-rouge">false</code>. Understandably, we should be
+unable to write expressions of type <code class="language-plaintext highlighter-rouge">true == false</code> or <code class="language-plaintext highlighter-rouge">false ==
+true</code>, since <code class="language-plaintext highlighter-rouge">true</code> and <code class="language-plaintext highlighter-rouge">false</code> are distinct values of type <code class="language-plaintext highlighter-rouge">Bool</code>
+which should be never identified.</p>
+
+<p>The question now is what <em>is</em> a proof that <code class="language-plaintext highlighter-rouge">true</code> is equal to <code class="language-plaintext highlighter-rouge">true</code>
+and, similarly, what is a proof that <code class="language-plaintext highlighter-rouge">false</code> is equal to
+<code class="language-plaintext highlighter-rouge">false</code>. Recall that, when we have defined the <code class="language-plaintext highlighter-rouge">Bool</code> data type, we
+have also listed all the <em>values</em> of type <code class="language-plaintext highlighter-rouge">Bool</code>, namely <code class="language-plaintext highlighter-rouge">true</code> and
+<code class="language-plaintext highlighter-rouge">false</code>. In a similar fashion, the <code class="language-plaintext highlighter-rouge">_==_</code> data type has a
+constructor called <code class="language-plaintext highlighter-rouge">refl</code> (for <em>reflexivity</em>) which is a proof of
+the fact that any value is equal to itself. We can use <code class="language-plaintext highlighter-rouge">refl</code> to
+write our first theorem about boolean values, namely that <code class="language-plaintext highlighter-rouge">true</code> is
+equal to <code class="language-plaintext highlighter-rouge">true</code>.</p>
+
+<pre class="Agda"><a id="true-eq"></a><a id="2466" href="Chapter.Intro.Bool.Properties.html#2466" class="Function">true-eq</a> <a id="2474" class="Symbol">:</a> <a id="2476" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a> <a id="2481" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="2484" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a>
+<a id="2489" href="Chapter.Intro.Bool.Properties.html#2466" class="Function">true-eq</a> <a id="2497" class="Symbol">=</a> <a id="2499" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+</pre>
+<p>In a similar fashion, it is easy to prove that <code class="language-plaintext highlighter-rouge">false</code> is
+equal to itself, again using the <code class="language-plaintext highlighter-rouge">refl</code> constructor:</p>
+
+<pre class="Agda"><a id="false-eq"></a><a id="2625" href="Chapter.Intro.Bool.Properties.html#2625" class="Function">false-eq</a> <a id="2634" class="Symbol">:</a> <a id="2636" href="Chapter.Intro.Bool.html#390" class="InductiveConstructor">false</a> <a id="2642" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="2645" href="Chapter.Intro.Bool.html#390" class="InductiveConstructor">false</a>
+<a id="2651" href="Chapter.Intro.Bool.Properties.html#2625" class="Function">false-eq</a> <a id="2660" class="Symbol">=</a> <a id="2662" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+</pre>
+<p>In general, <code class="language-plaintext highlighter-rouge">refl</code> can be used to prove any equality of the form <code class="language-plaintext highlighter-rouge">v
+== w</code> where <code class="language-plaintext highlighter-rouge">v</code> and <code class="language-plaintext highlighter-rouge">w</code> “are the same”. In <code class="language-plaintext highlighter-rouge">true-eq</code> and <code class="language-plaintext highlighter-rouge">false-eq</code>
+we have taken <code class="language-plaintext highlighter-rouge">v</code> and <code class="language-plaintext highlighter-rouge">w</code> to be syntactically the same term, which
+resulted in somewhat obvious and rather uninteresting properties. In
+general, Agda considers two expressions to be the same if they
+evaluate to the same value (technically speaking, if they have the
+same normal form). In the previous section we have seen the use of
+<code class="language-plaintext highlighter-rouge">C-c C-n</code> to <em>normalize</em> an expression such as <code class="language-plaintext highlighter-rouge">not true</code>, which
+yields <code class="language-plaintext highlighter-rouge">false</code>. So, <code class="language-plaintext highlighter-rouge">false</code> is the normal form of <code class="language-plaintext highlighter-rouge">not true</code>,
+meaning that for Agda <code class="language-plaintext highlighter-rouge">not true</code> and <code class="language-plaintext highlighter-rouge">false</code> are actually
+“equal”. This leads to a more interesting result about the behavior
+of <code class="language-plaintext highlighter-rouge">not</code>.</p>
+
+<pre class="Agda"><a id="not-true-eq"></a><a id="3409" href="Chapter.Intro.Bool.Properties.html#3409" class="Function">not-true-eq</a> <a id="3421" class="Symbol">:</a> <a id="3423" href="Chapter.Intro.Bool.html#1960" class="Function">not</a> <a id="3427" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a> <a id="3432" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="3435" href="Chapter.Intro.Bool.html#390" class="InductiveConstructor">false</a>
+<a id="3441" href="Chapter.Intro.Bool.Properties.html#3409" class="Function">not-true-eq</a> <a id="3453" class="Symbol">=</a> <a id="3455" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+</pre>
+<p>Here too we use the <code class="language-plaintext highlighter-rouge">refl</code> constructor as a proof that <code class="language-plaintext highlighter-rouge">not true</code>
+and <code class="language-plaintext highlighter-rouge">false</code> are equal. In order to accept this proof, Agda evaluates
+<code class="language-plaintext highlighter-rouge">not true</code> and <code class="language-plaintext highlighter-rouge">false</code>. The second term is already in normal
+form. The first term can be normalized using the definition of
+<code class="language-plaintext highlighter-rouge">not</code>, according to which <code class="language-plaintext highlighter-rouge">not true</code> yields <code class="language-plaintext highlighter-rouge">false</code>. This is enough
+to conclude that <code class="language-plaintext highlighter-rouge">not true</code> and <code class="language-plaintext highlighter-rouge">false</code> are equal.</p>
+
+<h2 id="proving-that-not-is-an-involution">Proving that <code class="language-plaintext highlighter-rouge">not</code> is an involution</h2>
+
+<p>Let us now prove that <code class="language-plaintext highlighter-rouge">not</code> is an involution, namely that <code class="language-plaintext highlighter-rouge">not</code> is
+the inverse function of itself. First of all we have to understand
+how to formulate this property. In mathematics we would write the
+following predicate:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>∀(x : Bool) . not (not x) == x
+</code></pre></div></div>
+
+<p>In Agda, we may state this property as the type</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>∀(x : Bool) -&gt; not (not x) == x
+</code></pre></div></div>
+
+<p>which describes a function that, when applied to a value <code class="language-plaintext highlighter-rouge">x</code> of type
+<code class="language-plaintext highlighter-rouge">Bool</code>, yields a proof that <code class="language-plaintext highlighter-rouge">not (not x)</code> is equal to <code class="language-plaintext highlighter-rouge">x</code>. Unlike
+the arrow types that we have used until now, this is an example of
+<strong>dependent function type</strong> because the type of the codomain of the
+function – <code class="language-plaintext highlighter-rouge">not (not x) == x</code> – <em>depends</em> the argument <code class="language-plaintext highlighter-rouge">x</code> to
+which the function is applied. The <code class="language-plaintext highlighter-rouge">∀</code> symbol is purely cosmetic and
+may be omitted. We will use it merely for readability.</p>
+
+<p>Going back to our goal, proving that <code class="language-plaintext highlighter-rouge">not</code> is an involution is the
+same as finding a function that has type <code class="language-plaintext highlighter-rouge">∀(x : Bool) -&gt; not (not x)
+== x</code>. That is, our goal is to fill the hole in the following
+partial definition:</p>
+
+<pre class="Agda"><a id="not-inv"></a><a id="4910" href="Chapter.Intro.Bool.Properties.html#4910" class="Function">not-inv</a> <a id="4918" class="Symbol">:</a> <a id="4920" class="Symbol">∀(</a><a id="4922" href="Chapter.Intro.Bool.Properties.html#4922" class="Bound">x</a> <a id="4924" class="Symbol">:</a> <a id="4926" href="Chapter.Intro.Bool.html#356" class="Datatype">Bool</a><a id="4930" class="Symbol">)</a> <a id="4932" class="Symbol">-&gt;</a> <a id="4935" href="Chapter.Intro.Bool.html#1960" class="Function">not</a> <a id="4939" class="Symbol">(</a><a id="4940" href="Chapter.Intro.Bool.html#1960" class="Function">not</a> <a id="4944" href="Chapter.Intro.Bool.Properties.html#4922" class="Bound">x</a><a id="4945" class="Symbol">)</a> <a id="4947" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="4950" href="Chapter.Intro.Bool.Properties.html#4922" class="Bound">x</a>
+<a id="4952" href="Chapter.Intro.Bool.Properties.html#4910" class="Function">not-inv</a> <a id="4960" href="Chapter.Intro.Bool.Properties.html#4960" class="Bound">x</a> <a id="4962" class="Symbol">=</a> <a id="4964" class="Hole">{!!}</a>
+</pre>
+<p>By placing the cursor in the hole and hitting <code class="language-plaintext highlighter-rouge">C-c C-,</code> we see that
+our goal is to provide an expression of type <code class="language-plaintext highlighter-rouge">not (not x) == x</code>
+having at our disposal a value <code class="language-plaintext highlighter-rouge">x</code> of type <code class="language-plaintext highlighter-rouge">Bool</code>. At this stage we
+might be tempted to fill the hole with <code class="language-plaintext highlighter-rouge">refl</code>, just like we’ve done
+before for <code class="language-plaintext highlighter-rouge">true-eq</code>, but if we try to do so Agda will complain with
+an error message saying that <code class="language-plaintext highlighter-rouge">not (not x)</code> and <code class="language-plaintext highlighter-rouge">x</code> are not the
+same. What happens here is that Agda tries to evaluate <code class="language-plaintext highlighter-rouge">not (not x)</code>
+and <code class="language-plaintext highlighter-rouge">x</code> to see if they have the same normal form. However, since
+both contain a variable <code class="language-plaintext highlighter-rouge">x</code>, which stands for an unknown boolean
+value, Agda is unable to reduce these terms any further: <code class="language-plaintext highlighter-rouge">x</code> is in
+normal form, <code class="language-plaintext highlighter-rouge">not (not x)</code> is in normal form and, for Agda, these
+terms are far from being the same.  If <code class="language-plaintext highlighter-rouge">not</code> is applied to <code class="language-plaintext highlighter-rouge">true</code>,
+then Agda knows that the result is <code class="language-plaintext highlighter-rouge">false</code>, and if <code class="language-plaintext highlighter-rouge">not</code> is applied
+to <code class="language-plaintext highlighter-rouge">false</code>, then Agda knows that the result is <code class="language-plaintext highlighter-rouge">true</code>, but if <code class="language-plaintext highlighter-rouge">not</code>
+is applied to some unknown boolean value <code class="language-plaintext highlighter-rouge">x</code>, the evaluation of <code class="language-plaintext highlighter-rouge">not
+x</code> (and thus of <code class="language-plaintext highlighter-rouge">not (not x)</code> as well) is simply stuck.</p>
+
+<p>To make some progress from here we have to recall that <code class="language-plaintext highlighter-rouge">not</code> has
+been defined <em>by cases</em> on its argument. The idea then is to proceed
+in a similar fashion also for the definition of <code class="language-plaintext highlighter-rouge">not-inv</code> by
+performing a case analysis on <code class="language-plaintext highlighter-rouge">x</code>.</p>
+
+<pre class="Agda"><a id="not-inv₁"></a><a id="6270" href="Chapter.Intro.Bool.Properties.html#6270" class="Function">not-inv₁</a> <a id="6279" class="Symbol">:</a> <a id="6281" class="Symbol">∀(</a><a id="6283" href="Chapter.Intro.Bool.Properties.html#6283" class="Bound">x</a> <a id="6285" class="Symbol">:</a> <a id="6287" href="Chapter.Intro.Bool.html#356" class="Datatype">Bool</a><a id="6291" class="Symbol">)</a> <a id="6293" class="Symbol">-&gt;</a> <a id="6296" href="Chapter.Intro.Bool.html#1960" class="Function">not</a> <a id="6300" class="Symbol">(</a><a id="6301" href="Chapter.Intro.Bool.html#1960" class="Function">not</a> <a id="6305" href="Chapter.Intro.Bool.Properties.html#6283" class="Bound">x</a><a id="6306" class="Symbol">)</a> <a id="6308" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="6311" href="Chapter.Intro.Bool.Properties.html#6283" class="Bound">x</a>
+<a id="6313" href="Chapter.Intro.Bool.Properties.html#6270" class="Function">not-inv₁</a> <a id="6322" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a>  <a id="6328" class="Symbol">=</a> <a id="6330" class="Hole">{!!}</a>
+<a id="6335" href="Chapter.Intro.Bool.Properties.html#6270" class="Function">not-inv₁</a> <a id="6344" href="Chapter.Intro.Bool.html#390" class="InductiveConstructor">false</a> <a id="6350" class="Symbol">=</a> <a id="6352" class="Hole">{!!}</a>
+</pre>
+<p>Just like in the definition of <code class="language-plaintext highlighter-rouge">not</code>, here too we end up with two
+equations corresponding to the two possible forms for the argument
+<code class="language-plaintext highlighter-rouge">x</code>. However, something interesting happens in the type of the
+function: if we place the cursor in the first hole and hit <code class="language-plaintext highlighter-rouge">C-c C-,</code>
+we see that the goal is now <code class="language-plaintext highlighter-rouge">true == true</code> instead of <code class="language-plaintext highlighter-rouge">not (not
+x)</code>. What has happened here is that the first hole corresponds to
+the case in which <code class="language-plaintext highlighter-rouge">x</code> is <code class="language-plaintext highlighter-rouge">true</code>. In this case, Agda is able to
+evaluate <code class="language-plaintext highlighter-rouge">not (not x)</code> to <code class="language-plaintext highlighter-rouge">true</code> using the definition of <code class="language-plaintext highlighter-rouge">not</code>. The
+good news is that we are now able to provide the proof that <code class="language-plaintext highlighter-rouge">true</code>
+is equal to <code class="language-plaintext highlighter-rouge">true</code>, that is just <code class="language-plaintext highlighter-rouge">true-eq</code>. A similar thing happens
+for the second hole. In this case, Agda knows that <code class="language-plaintext highlighter-rouge">x</code> is <code class="language-plaintext highlighter-rouge">false</code>,
+so the goal simplifies to <code class="language-plaintext highlighter-rouge">false == false</code> for which <code class="language-plaintext highlighter-rouge">false-eq</code> is a
+perfectly valid proof. We have thus completed our first proper
+theorem in Agda:</p>
+
+<pre class="Agda"><a id="not-inv₂"></a><a id="7244" href="Chapter.Intro.Bool.Properties.html#7244" class="Function">not-inv₂</a> <a id="7253" class="Symbol">:</a> <a id="7255" class="Symbol">∀(</a><a id="7257" href="Chapter.Intro.Bool.Properties.html#7257" class="Bound">x</a> <a id="7259" class="Symbol">:</a> <a id="7261" href="Chapter.Intro.Bool.html#356" class="Datatype">Bool</a><a id="7265" class="Symbol">)</a> <a id="7267" class="Symbol">-&gt;</a> <a id="7270" href="Chapter.Intro.Bool.html#1960" class="Function">not</a> <a id="7274" class="Symbol">(</a><a id="7275" href="Chapter.Intro.Bool.html#1960" class="Function">not</a> <a id="7279" href="Chapter.Intro.Bool.Properties.html#7257" class="Bound">x</a><a id="7280" class="Symbol">)</a> <a id="7282" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="7285" href="Chapter.Intro.Bool.Properties.html#7257" class="Bound">x</a>
+<a id="7287" href="Chapter.Intro.Bool.Properties.html#7244" class="Function">not-inv₂</a> <a id="7296" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a>  <a id="7302" class="Symbol">=</a> <a id="7304" href="Chapter.Intro.Bool.Properties.html#2466" class="Function">true-eq</a>
+<a id="7312" href="Chapter.Intro.Bool.Properties.html#7244" class="Function">not-inv₂</a> <a id="7321" href="Chapter.Intro.Bool.html#390" class="InductiveConstructor">false</a> <a id="7327" class="Symbol">=</a> <a id="7329" href="Chapter.Intro.Bool.Properties.html#2625" class="Function">false-eq</a>
+</pre>
+<p>Note that, since <code class="language-plaintext highlighter-rouge">true-eq</code> and <code class="language-plaintext highlighter-rouge">false-eq</code> are definitionally equal
+to <code class="language-plaintext highlighter-rouge">refl</code>, we could have equivalently written <code class="language-plaintext highlighter-rouge">refl</code> on the right
+hand side of the two equations in the definition of <code class="language-plaintext highlighter-rouge">not-inv₂</code>.</p>
+
+<h2 id="commutativity-of--and-telescopes">Commutativity of <code class="language-plaintext highlighter-rouge">&amp;&amp;</code> and telescopes</h2>
+
+<p>We conclude this chapter with another simple proof concerning the
+fact that <code class="language-plaintext highlighter-rouge">&amp;&amp;</code> is commutative, namely that <code class="language-plaintext highlighter-rouge">x &amp;&amp; y == y &amp;&amp; x</code> for
+every <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code>.</p>
+
+<pre class="Agda"><a id="&amp;&amp;-comm"></a><a id="7738" href="Chapter.Intro.Bool.Properties.html#7738" class="Function">&amp;&amp;-comm</a> <a id="7746" class="Symbol">:</a> <a id="7748" class="Symbol">∀(</a><a id="7750" href="Chapter.Intro.Bool.Properties.html#7750" class="Bound">x</a> <a id="7752" class="Symbol">:</a> <a id="7754" href="Chapter.Intro.Bool.html#356" class="Datatype">Bool</a><a id="7758" class="Symbol">)</a> <a id="7760" class="Symbol">-&gt;</a> <a id="7763" class="Symbol">∀(</a><a id="7765" href="Chapter.Intro.Bool.Properties.html#7765" class="Bound">y</a> <a id="7767" class="Symbol">:</a> <a id="7769" href="Chapter.Intro.Bool.html#356" class="Datatype">Bool</a><a id="7773" class="Symbol">)</a> <a id="7775" class="Symbol">-&gt;</a> <a id="7778" href="Chapter.Intro.Bool.Properties.html#7750" class="Bound">x</a> <a id="7780" href="Chapter.Intro.Bool.html#7734" class="Function Operator">&amp;&amp;</a> <a id="7783" href="Chapter.Intro.Bool.Properties.html#7765" class="Bound">y</a> <a id="7785" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="7788" href="Chapter.Intro.Bool.Properties.html#7765" class="Bound">y</a> <a id="7790" href="Chapter.Intro.Bool.html#7734" class="Function Operator">&amp;&amp;</a> <a id="7793" href="Chapter.Intro.Bool.Properties.html#7750" class="Bound">x</a>
+<a id="7795" href="Chapter.Intro.Bool.Properties.html#7738" class="Function">&amp;&amp;-comm</a> <a id="7803" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a>  <a id="7809" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a>  <a id="7815" class="Symbol">=</a> <a id="7817" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+<a id="7822" href="Chapter.Intro.Bool.Properties.html#7738" class="Function">&amp;&amp;-comm</a> <a id="7830" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a>  <a id="7836" href="Chapter.Intro.Bool.html#390" class="InductiveConstructor">false</a> <a id="7842" class="Symbol">=</a> <a id="7844" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+<a id="7849" href="Chapter.Intro.Bool.Properties.html#7738" class="Function">&amp;&amp;-comm</a> <a id="7857" href="Chapter.Intro.Bool.html#390" class="InductiveConstructor">false</a> <a id="7863" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a>  <a id="7869" class="Symbol">=</a> <a id="7871" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+<a id="7876" href="Chapter.Intro.Bool.Properties.html#7738" class="Function">&amp;&amp;-comm</a> <a id="7884" href="Chapter.Intro.Bool.html#390" class="InductiveConstructor">false</a> <a id="7890" href="Chapter.Intro.Bool.html#390" class="InductiveConstructor">false</a> <a id="7896" class="Symbol">=</a> <a id="7898" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+</pre>
+<p>In this proof we have to perform two independent case analyses, one
+for each argument of <code class="language-plaintext highlighter-rouge">&amp;&amp;-comm</code>. This happens because the <code class="language-plaintext highlighter-rouge">_&amp;&amp;_</code>
+function is defined by case analysis on its first argument so, by
+doing case analysis only on <code class="language-plaintext highlighter-rouge">x</code>, Agda is able to simplify the <code class="language-plaintext highlighter-rouge">x &amp;&amp;
+y</code> part of the goal but not the <code class="language-plaintext highlighter-rouge">y &amp;&amp; x</code> part. Symmetrically, by
+doing case analysis only on <code class="language-plaintext highlighter-rouge">y</code>, Agda is able to simplify the <code class="language-plaintext highlighter-rouge">y &amp;&amp;
+x</code> part of the goal but not the <code class="language-plaintext highlighter-rouge">x &amp;&amp; y</code> part.</p>
+
+<p>We take advantage of this example to illustrate some convenient
+syntactic sugar that allows us to write more compact and more
+readable types. From the type of <code class="language-plaintext highlighter-rouge">&amp;&amp;-comm</code> we see that <code class="language-plaintext highlighter-rouge">&amp;&amp;-comm</code> is
+a function that, when applied to two arguments <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code> of type
+<code class="language-plaintext highlighter-rouge">Bool</code>, yields a proof that <code class="language-plaintext highlighter-rouge">x &amp;&amp; y == y &amp;&amp; x</code>. In Agda it is not
+necessary to write the <code class="language-plaintext highlighter-rouge">-&gt;</code> symbol to separate subsequent arguments
+in a dependent function type. That is, the type of <code class="language-plaintext highlighter-rouge">&amp;&amp;-comm</code> can be
+equivalently written as</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&amp;&amp;-comm : ∀(x : Bool) (y : Bool) -&gt; x &amp;&amp; y == y &amp;&amp; x
+</code></pre></div></div>
+
+<p>Also, where there are multiple subsequent arguments of the same type
+in a dependent function type we can collapse them together, like
+this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&amp;&amp;-comm : ∀(x y : Bool) -&gt; x &amp;&amp; y == y &amp;&amp; x
+</code></pre></div></div>
+
+<p>This is sometimes referred to as Agda’s “telescopic notation”. Note
+that these types are totally equivalent and therefore
+interchangeable.</p>
+
+<h2 id="exercises">Exercises</h2>
+
+<ol>
+  <li>Prove that <code class="language-plaintext highlighter-rouge">true</code> is both a left and a right unit for <code class="language-plaintext highlighter-rouge">&amp;&amp;</code>,
+namely that <code class="language-plaintext highlighter-rouge">true &amp;&amp; x == x</code> and <code class="language-plaintext highlighter-rouge">x &amp;&amp; true == x</code> for every
+<code class="language-plaintext highlighter-rouge">x</code>. Make sure to use case analysis on <code class="language-plaintext highlighter-rouge">x</code> only if necessary.</li>
+  <li>Prove that <code class="language-plaintext highlighter-rouge">&amp;&amp;</code> is associative, namely that <code class="language-plaintext highlighter-rouge">x &amp;&amp; (y &amp;&amp; z) == (x
+&amp;&amp; y) &amp;&amp; z</code> for every <code class="language-plaintext highlighter-rouge">x</code>, <code class="language-plaintext highlighter-rouge">y</code> and <code class="language-plaintext highlighter-rouge">z</code>. Make sure to use the
+telescopic notation and case analysis only if necessary.</li>
+  <li>Prove De Morgan’s laws for the boolean operators, namely that
+<code class="language-plaintext highlighter-rouge">not (x &amp;&amp; y) == not x || not y</code> and that <code class="language-plaintext highlighter-rouge">not (x || y) == not x
+&amp;&amp; not y</code>.</li>
+</ol>
+
+<pre class="Agda solution"><a id="9780" class="Comment">-- EXERCISE 1</a>
+
+<a id="9795" class="Comment">-- when proving that x is a left unit for &amp;&amp; it is not necessary to</a>
+<a id="9863" class="Comment">-- perform a case analysis on x because, according to the definition</a>
+<a id="9932" class="Comment">-- of &amp;&amp;, true &amp;&amp; x is the same as x</a>
+
+<a id="&amp;&amp;-unit-l"></a><a id="9970" href="Chapter.Intro.Bool.Properties.html#9970" class="Function">&amp;&amp;-unit-l</a> <a id="9980" class="Symbol">:</a> <a id="9982" class="Symbol">∀(</a><a id="9984" href="Chapter.Intro.Bool.Properties.html#9984" class="Bound">x</a> <a id="9986" class="Symbol">:</a> <a id="9988" href="Chapter.Intro.Bool.html#356" class="Datatype">Bool</a><a id="9992" class="Symbol">)</a> <a id="9994" class="Symbol">-&gt;</a> <a id="9997" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a> <a id="10002" href="Chapter.Intro.Bool.html#7734" class="Function Operator">&amp;&amp;</a> <a id="10005" href="Chapter.Intro.Bool.Properties.html#9984" class="Bound">x</a> <a id="10007" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="10010" href="Chapter.Intro.Bool.Properties.html#9984" class="Bound">x</a>
+<a id="10012" href="Chapter.Intro.Bool.Properties.html#9970" class="Function">&amp;&amp;-unit-l</a> <a id="10022" href="Chapter.Intro.Bool.Properties.html#10022" class="Bound">x</a> <a id="10024" class="Symbol">=</a> <a id="10026" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+
+<a id="&amp;&amp;-unit-r"></a><a id="10032" href="Chapter.Intro.Bool.Properties.html#10032" class="Function">&amp;&amp;-unit-r</a> <a id="10042" class="Symbol">:</a> <a id="10044" class="Symbol">∀(</a><a id="10046" href="Chapter.Intro.Bool.Properties.html#10046" class="Bound">x</a> <a id="10048" class="Symbol">:</a> <a id="10050" href="Chapter.Intro.Bool.html#356" class="Datatype">Bool</a><a id="10054" class="Symbol">)</a> <a id="10056" class="Symbol">-&gt;</a> <a id="10059" href="Chapter.Intro.Bool.Properties.html#10046" class="Bound">x</a> <a id="10061" href="Chapter.Intro.Bool.html#7734" class="Function Operator">&amp;&amp;</a> <a id="10064" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a> <a id="10069" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="10072" href="Chapter.Intro.Bool.Properties.html#10046" class="Bound">x</a>
+<a id="10074" href="Chapter.Intro.Bool.Properties.html#10032" class="Function">&amp;&amp;-unit-r</a> <a id="10084" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a>  <a id="10090" class="Symbol">=</a> <a id="10092" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+<a id="10097" href="Chapter.Intro.Bool.Properties.html#10032" class="Function">&amp;&amp;-unit-r</a> <a id="10107" href="Chapter.Intro.Bool.html#390" class="InductiveConstructor">false</a> <a id="10113" class="Symbol">=</a> <a id="10115" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+
+<a id="10121" class="Comment">-- EXERCISE 2</a>
+
+<a id="&amp;&amp;-assoc"></a><a id="10136" href="Chapter.Intro.Bool.Properties.html#10136" class="Function">&amp;&amp;-assoc</a> <a id="10145" class="Symbol">:</a> <a id="10147" class="Symbol">∀(</a><a id="10149" href="Chapter.Intro.Bool.Properties.html#10149" class="Bound">x</a> <a id="10151" href="Chapter.Intro.Bool.Properties.html#10151" class="Bound">y</a> <a id="10153" href="Chapter.Intro.Bool.Properties.html#10153" class="Bound">z</a> <a id="10155" class="Symbol">:</a> <a id="10157" href="Chapter.Intro.Bool.html#356" class="Datatype">Bool</a><a id="10161" class="Symbol">)</a> <a id="10163" class="Symbol">-&gt;</a> <a id="10166" href="Chapter.Intro.Bool.Properties.html#10149" class="Bound">x</a> <a id="10168" href="Chapter.Intro.Bool.html#7734" class="Function Operator">&amp;&amp;</a> <a id="10171" class="Symbol">(</a><a id="10172" href="Chapter.Intro.Bool.Properties.html#10151" class="Bound">y</a> <a id="10174" href="Chapter.Intro.Bool.html#7734" class="Function Operator">&amp;&amp;</a> <a id="10177" href="Chapter.Intro.Bool.Properties.html#10153" class="Bound">z</a><a id="10178" class="Symbol">)</a> <a id="10180" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="10183" class="Symbol">(</a><a id="10184" href="Chapter.Intro.Bool.Properties.html#10149" class="Bound">x</a> <a id="10186" href="Chapter.Intro.Bool.html#7734" class="Function Operator">&amp;&amp;</a> <a id="10189" href="Chapter.Intro.Bool.Properties.html#10151" class="Bound">y</a><a id="10190" class="Symbol">)</a> <a id="10192" href="Chapter.Intro.Bool.html#7734" class="Function Operator">&amp;&amp;</a> <a id="10195" href="Chapter.Intro.Bool.Properties.html#10153" class="Bound">z</a>
+<a id="10197" href="Chapter.Intro.Bool.Properties.html#10136" class="Function">&amp;&amp;-assoc</a> <a id="10206" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a> <a id="10211" href="Chapter.Intro.Bool.Properties.html#10211" class="Bound">y</a> <a id="10213" href="Chapter.Intro.Bool.Properties.html#10213" class="Bound">z</a> <a id="10215" class="Symbol">=</a> <a id="10217" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+<a id="10222" href="Chapter.Intro.Bool.Properties.html#10136" class="Function">&amp;&amp;-assoc</a> <a id="10231" href="Chapter.Intro.Bool.html#390" class="InductiveConstructor">false</a> <a id="10237" href="Chapter.Intro.Bool.Properties.html#10237" class="Bound">y</a> <a id="10239" href="Chapter.Intro.Bool.Properties.html#10239" class="Bound">z</a> <a id="10241" class="Symbol">=</a> <a id="10243" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+
+<a id="10249" class="Comment">-- EXERCISE 3</a>
+
+<a id="not-&amp;&amp;"></a><a id="10264" href="Chapter.Intro.Bool.Properties.html#10264" class="Function">not-&amp;&amp;</a> <a id="10271" class="Symbol">:</a> <a id="10273" class="Symbol">∀(</a><a id="10275" href="Chapter.Intro.Bool.Properties.html#10275" class="Bound">x</a> <a id="10277" href="Chapter.Intro.Bool.Properties.html#10277" class="Bound">y</a> <a id="10279" class="Symbol">:</a> <a id="10281" href="Chapter.Intro.Bool.html#356" class="Datatype">Bool</a><a id="10285" class="Symbol">)</a> <a id="10287" class="Symbol">-&gt;</a> <a id="10290" href="Chapter.Intro.Bool.html#1960" class="Function">not</a> <a id="10294" class="Symbol">(</a><a id="10295" href="Chapter.Intro.Bool.Properties.html#10275" class="Bound">x</a> <a id="10297" href="Chapter.Intro.Bool.html#7734" class="Function Operator">&amp;&amp;</a> <a id="10300" href="Chapter.Intro.Bool.Properties.html#10277" class="Bound">y</a><a id="10301" class="Symbol">)</a> <a id="10303" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="10306" href="Chapter.Intro.Bool.html#1960" class="Function">not</a> <a id="10310" href="Chapter.Intro.Bool.Properties.html#10275" class="Bound">x</a> <a id="10312" href="Chapter.Intro.Bool.html#9948" class="Function Operator">||</a> <a id="10315" href="Chapter.Intro.Bool.html#1960" class="Function">not</a> <a id="10319" href="Chapter.Intro.Bool.Properties.html#10277" class="Bound">y</a>
+<a id="10321" href="Chapter.Intro.Bool.Properties.html#10264" class="Function">not-&amp;&amp;</a> <a id="10328" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a>  <a id="10334" class="Symbol">_</a> <a id="10336" class="Symbol">=</a> <a id="10338" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+<a id="10343" href="Chapter.Intro.Bool.Properties.html#10264" class="Function">not-&amp;&amp;</a> <a id="10350" href="Chapter.Intro.Bool.html#390" class="InductiveConstructor">false</a> <a id="10356" class="Symbol">_</a> <a id="10358" class="Symbol">=</a> <a id="10360" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+
+<a id="not-||"></a><a id="10366" href="Chapter.Intro.Bool.Properties.html#10366" class="Function">not-||</a> <a id="10373" class="Symbol">:</a> <a id="10375" class="Symbol">∀(</a><a id="10377" href="Chapter.Intro.Bool.Properties.html#10377" class="Bound">x</a> <a id="10379" href="Chapter.Intro.Bool.Properties.html#10379" class="Bound">y</a> <a id="10381" class="Symbol">:</a> <a id="10383" href="Chapter.Intro.Bool.html#356" class="Datatype">Bool</a><a id="10387" class="Symbol">)</a> <a id="10389" class="Symbol">-&gt;</a> <a id="10392" href="Chapter.Intro.Bool.html#1960" class="Function">not</a> <a id="10396" class="Symbol">(</a><a id="10397" href="Chapter.Intro.Bool.Properties.html#10377" class="Bound">x</a> <a id="10399" href="Chapter.Intro.Bool.html#9948" class="Function Operator">||</a> <a id="10402" href="Chapter.Intro.Bool.Properties.html#10379" class="Bound">y</a><a id="10403" class="Symbol">)</a> <a id="10405" href="Library.Equality.html#83" class="Datatype Operator">==</a> <a id="10408" href="Chapter.Intro.Bool.html#1960" class="Function">not</a> <a id="10412" href="Chapter.Intro.Bool.Properties.html#10377" class="Bound">x</a> <a id="10414" href="Chapter.Intro.Bool.html#7734" class="Function Operator">&amp;&amp;</a> <a id="10417" href="Chapter.Intro.Bool.html#1960" class="Function">not</a> <a id="10421" href="Chapter.Intro.Bool.Properties.html#10379" class="Bound">y</a>
+<a id="10423" href="Chapter.Intro.Bool.Properties.html#10366" class="Function">not-||</a> <a id="10430" href="Chapter.Intro.Bool.html#375" class="InductiveConstructor">true</a>  <a id="10436" class="Symbol">_</a> <a id="10438" class="Symbol">=</a> <a id="10440" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+<a id="10445" href="Chapter.Intro.Bool.Properties.html#10366" class="Function">not-||</a> <a id="10452" href="Chapter.Intro.Bool.html#390" class="InductiveConstructor">false</a> <a id="10458" class="Symbol">_</a> <a id="10460" class="Symbol">=</a> <a id="10462" href="Library.Equality.html#125" class="InductiveConstructor">refl</a>
+</pre>
+
+  </div>
+  <ul class="menu">
+  <li>
+    <a href="Chapter.Intro.Bool.html">‹ Inductive data types: the Booleans</a></li>
+  <li>
+    <a href="Chapter.Intro.NaturalNumbers.html">Natural numbers ›</a></li>
+</ul>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+  <div class="wrapper">
+    <!-- <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"> -->
+    <!--   <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png"/> -->
+    <!-- </a> -->
+    2022-2023
+    <a href="https://boystrange.github.io">Luca Padovani</a>
+    and <a href="http://www.di.unito.it/~deligu/">Ugo de'Liguoro</a>.
+    Page generated on 20 Sep 2023.
+  </div>
+</footer>
+</body>
+
+</html>
